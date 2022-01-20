@@ -1,0 +1,25 @@
+{
+  "name": "oxil/kinimailer",
+  "version": "0.1",
+  "description": "Kinimailer - Open source mailer components for managing mailshots etc.",
+  "keywords": [
+    "PHP",
+    "mailer",
+    "news letters"
+  ],
+  "homepage": "https://kinimailer.com",
+  "type": "library",
+  "require": {
+    "oxil/kiniauth": "dev-master"
+  },
+  "scripts": {
+    "dev": "rm -rf vendor/oxil/kini*; ln -s ../../../kinikit/kinikit-core vendor/oxil/kinikit-core; ln -s ../../../kinikit/kinikit-mvc vendor/oxil/kinikit-mvc; ln -s ../../../kinikit/kinikit-persistence vendor/oxil/kinikit-persistence; ln -s ../../../kiniauth vendor/oxil/kiniauth"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Kinimailer\\Test\\": "php/test/",
+      "Kinimailer\\": "php/src/"
+    }
+  }
+}
