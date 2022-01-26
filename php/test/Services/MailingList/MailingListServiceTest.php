@@ -1,0 +1,296 @@
+<?php
+
+namespace Kinimailer\Services\MailingList;
+
+use Kiniauth\Test\Services\Security\AuthenticationHelper;
+use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Validation\ValidationException;
+use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
+use Kinimailer\Objects\MailingList\MailingList;
+use Kinimailer\Objects\MailingList\MailingListSubscriber;
+use Kinimailer\Objects\MailingList\MailingListSummary;
+use Kinimailer\TestBase;
+use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriberPreferences;
+use Kinimailer\ValueObjects\MailingList\UserMailingListSubscriberPreferences;
+
+include_once "autoloader.php";
+
+class MailingListServiceTest extends TestBase {
+
+    /**
+     * @var MailingListService
+     */
+    private $mailingListService;
+
+    /**
+     * Mailing list service
+     */
+    public function setUp(): void {
+        $this->mailingListService = Container::instance()->get(MailingListService::class);
+    }
+
+    public function testCanCreateReadUpdateAndDeleteMailingListAsSuperAdmin() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+
+        $mailingList = new MailingListSummary("newone", "New Mailing List", "My New test mailing list");
+        $newId = $this->mailingListService->saveMailingList($mailingList);
+        $this->assertNotNull($newId);
+        $reList = MailingList::fetch($newId);
+        $this->assertEquals("newone", $reList->getKey());
+        $this->assertEquals("New Mailing List", $reList->getTitle());
+        $this->assertEquals("My New test mailing list", $reList->getDescription());
+        $this->assertFalse($reList->isAnonymousSignUp());
+        $this->assertSame(0, $reList->getAccountId());
+
+        // Check can get one
+        $reSummary = $this->mailingListService->getMailingList($newId);
+        $this->assertEquals($reList->returnSummary(), $reSummary);
+
+        // Update one
+        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, $newId);
+        $this->mailingListService->saveMailingList($update);
+
+        $reSummary = $this->mailingListService->getMailingList($newId);
+        $this->assertEquals($update, $reSummary);
+
+
+        // Delete
+        $this->mailingListService->removeMailingList($newId);
+        try {
+            $this->mailingListService->getMailingList($newId);
+            $this->fail("Should have thrown here");
+        } catch (ObjectNotFoundException $e) {
+            // Success
+        }
+
+
+    }
+
+
+    public function testCanCreateReadUpdateAndDeleteMailingListAsAccountHolder() {
+
+        AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
+
+        $mailingList = new MailingListSummary("newone", "New Mailing List", "My New test mailing list");
+        $newId = $this->mailingListService->saveMailingList($mailingList);
+        $this->assertNotNull($newId);
+        $reList = MailingList::fetch($newId);
+        $this->assertEquals("newone", $reList->getKey());
+        $this->assertEquals("New Mailing List", $reList->getTitle());
+        $this->assertEquals("My New test mailing list", $reList->getDescription());
+        $this->assertFalse($reList->isAnonymousSignUp());
+        $this->assertSame(1, $reList->getAccountId());
+
+        // Check can get one
+        $reSummary = $this->mailingListService->getMailingList($newId);
+        $this->assertEquals($reList->returnSummary(), $reSummary);
+
+        // Update one
+        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, $newId);
+        $this->mailingListService->saveMailingList($update);
+
+        $reSummary = $this->mailingListService->getMailingList($newId);
+        $this->assertEquals($update, $reSummary);
+
+
+        // Delete
+        $this->mailingListService->removeMailingList($newId);
+        try {
+            $this->mailingListService->getMailingList($newId);
+            $this->fail("Should have thrown here");
+        } catch (ObjectNotFoundException $e) {
+            // Success
+        }
+
+
+    }
+
+
+    public function testDuplicateMailingListKeysAreNotPermittedInSameAccountCombination() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $mailingList = new MailingListSummary("duplicate", "New Mailing List", "My New test mailing list");
+
+        $this->mailingListService->saveMailingList($mailingList);
+        try {
+            $this->mailingListService->saveMailingList($mailingList);
+            $this->fail("Should have thrown here");
+        } catch (ValidationException $e) {
+            $this->assertTrue(true);
+        }
+
+        AuthenticationHelper::login("simon@peterjonescarwash.com", "password");
+        $this->mailingListService->saveMailingList($mailingList);
+        try {
+            $this->mailingListService->saveMailingList($mailingList);
+            $this->fail("Should have thrown here");
+        } catch (ValidationException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            $this->mailingListService->saveMailingList($mailingList, "soapSuds");
+            $this->fail("Should have thrown here");
+        } catch (ValidationException $e) {
+            $this->assertTrue(true);
+        }
+
+
+    }
+
+
+    public function testCanCheckForDuplicateMailingListKeys() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $mailingList = new MailingListSummary("newduplicate", "New Mailing List", "My New test mailing list");
+
+        // Should be fine for a new item
+        $this->assertTrue($this->mailingListService->isKeyAvailableForMailingList("newduplicate"));
+
+        // Save it.
+        $newId = $this->mailingListService->saveMailingList($mailingList);
+
+        // Should not be fine for a new item or a different id
+        $this->assertFalse($this->mailingListService->isKeyAvailableForMailingList("newduplicate"));
+        $this->assertFalse($this->mailingListService->isKeyAvailableForMailingList("newduplicate", 100));
+
+        // Should be fine for same id
+        $this->assertTrue($this->mailingListService->isKeyAvailableForMailingList("newduplicate", $newId));
+
+        // Try different account
+        AuthenticationHelper::login("simon@peterjonescarwash.com", "password");
+
+        // Should be fine for a new item
+        $this->assertTrue($this->mailingListService->isKeyAvailableForMailingList("newduplicate"));
+
+        // Save it.
+        $newId = $this->mailingListService->saveMailingList($mailingList);
+
+        // Should not be fine for a new item or a different id
+        $this->assertFalse($this->mailingListService->isKeyAvailableForMailingList("newduplicate"));
+        $this->assertFalse($this->mailingListService->isKeyAvailableForMailingList("newduplicate", 100));
+
+        // Should be fine for same id
+        $this->assertTrue($this->mailingListService->isKeyAvailableForMailingList("newduplicate", $newId));
+
+
+    }
+
+
+    public function testCanGetMailingListByKeyAndParentAccountId() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $mailingList = new MailingListSummary("adminowned", "New Mailing List", "My New test mailing list");
+        $id = $this->mailingListService->saveMailingList($mailingList);
+        $savedMailingList = MailingList::fetch($id)->returnSummary();
+
+        // Check direct account id lookup
+        $this->assertEquals($savedMailingList, $this->mailingListService->getMailingListByKey("adminowned", 0));
+
+        AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
+        $reMailingList = $this->mailingListService->getMailingListByKey("adminowned");
+        $this->assertEquals($savedMailingList, $reMailingList);
+
+    }
+
+
+    public function testCanUpdateMailingListPreferencesForGuest() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $id1 = $this->mailingListService->saveMailingList(new MailingListSummary("adminuseronly", "New User only", "My New user only mailing list"));
+        $id2 = $this->mailingListService->saveMailingList(new MailingListSummary("adminguest", "New Guest List", "My guest mailing list", true));
+        $id3 = $this->mailingListService->saveMailingList(new MailingListSummary("adminguest2", "New Guest List 2", "My guest mailing list 2", true));
+
+        // Logout
+        AuthenticationHelper::logout();
+
+        $preferences = new GuestMailingListSubscriberPreferences([
+            "adminuseronly" => 1,
+            "adminguest" => 1,
+            "adminguest2" => 1
+        ], "test@noaccount.com", "07890 111111", "Test No Account");
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+
+        // Check we subscribed
+        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND mailing_list_id IN (?,?,?) ",
+            "test@noaccount.com", "07890 111111", "Test No Account", $id1, $id2, $id3);
+
+        $this->assertEquals(2, sizeof($matches));
+        $this->assertEquals($id2, $matches[0]->getMailingListId());
+        $this->assertEquals($id3, $matches[1]->getMailingListId());
+
+
+
+        $preferences = new GuestMailingListSubscriberPreferences([
+            "adminguest" => 0,
+            "adminguest2" => 1
+        ], "test@noaccount.com", "07890 111111", "Test No Account");
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+
+        // Check we subscribed
+        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND mailing_list_id IN (?,?,?) ",
+            "test@noaccount.com", "07890 111111", "Test No Account", $id1, $id2, $id3);
+
+        $this->assertEquals(1, sizeof($matches));
+        $this->assertEquals($id3, $matches[0]->getMailingListId());
+
+
+    }
+
+
+    public function testCanUpdateMailingListPreferencesForUser() {
+
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $id1 = $this->mailingListService->saveMailingList(new MailingListSummary("anotheruseronly", "New User only", "My New user only mailing list"));
+        $id2 = $this->mailingListService->saveMailingList(new MailingListSummary("anotherguest", "New Guest List", "My guest mailing list", true));
+        $id3 = $this->mailingListService->saveMailingList(new MailingListSummary("anotherguest2", "New Guest List 2", "My guest mailing list 2", true));
+
+        // Logout
+        AuthenticationHelper::logout();
+
+        $preferences = new UserMailingListSubscriberPreferences([
+            "anotheruseronly" => 1,
+            "anotherguest" => 1,
+            "anotherguest2" => 1
+        ], 1);
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+
+        // Check we subscribed
+        $matches = MailingListSubscriber::filter("WHERE user_id = ? AND mailing_list_id IN (?,?,?) ",
+            1, $id1, $id2, $id3);
+
+        $this->assertEquals(3, sizeof($matches));
+        $this->assertEquals($id1, $matches[0]->getMailingListId());
+        $this->assertEquals($id2, $matches[1]->getMailingListId());
+        $this->assertEquals($id3, $matches[2]->getMailingListId());
+
+
+
+        $preferences = new UserMailingListSubscriberPreferences([
+            "anotheruseronly" => 0,
+            "anotherguest" => 0,
+            "anotherguest2" => 1
+        ], 1);
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+
+        // Check we subscribed
+        $matches = MailingListSubscriber::filter("WHERE user_id = ? AND mailing_list_id IN (?,?,?) ",
+            1, $id1, $id2, $id3);
+
+        $this->assertEquals(1, sizeof($matches));
+        $this->assertEquals($id3, $matches[0]->getMailingListId());
+
+
+    }
+
+}
