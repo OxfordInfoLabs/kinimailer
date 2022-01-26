@@ -223,7 +223,6 @@ class MailingListServiceTest extends TestBase {
         $this->assertEquals($id3, $matches[1]->getMailingListId());
 
 
-
         $preferences = new GuestMailingListSubscriberPreferences([
             "adminguest" => 0,
             "adminguest2" => 1
@@ -273,7 +272,6 @@ class MailingListServiceTest extends TestBase {
         $this->assertEquals($id3, $matches[2]->getMailingListId());
 
 
-
         $preferences = new UserMailingListSubscriberPreferences([
             "anotheruseronly" => 0,
             "anotherguest" => 0,
@@ -289,6 +287,57 @@ class MailingListServiceTest extends TestBase {
 
         $this->assertEquals(1, sizeof($matches));
         $this->assertEquals($id3, $matches[0]->getMailingListId());
+
+
+    }
+
+
+    public function testCanUnsubscribeSingleSubscriptionUsingUnsubscribeKey() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $this->mailingListService->saveMailingList(new MailingListSummary("testunsubscribe", "Test", "Test ML", true));
+
+        AuthenticationHelper::logout();
+
+        $this->mailingListService->updateSubscriptionPreferences(new GuestMailingListSubscriberPreferences([
+            "testunsubscribe" => 1
+        ], "geoff@test.com"));
+
+        $key = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com")[0]->getUnsubscribeKey();
+
+        // Bad email address
+        $this->mailingListService->unsubscribeBykey($key, "wrongemail@test.com");
+
+        // Should still be subscribed
+        $entries = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com");
+        $this->assertEquals(1, sizeof($entries));
+
+        // Correct email address
+        $this->mailingListService->unsubscribeBykey($key, $entries[0]->returnEmailHash());
+
+        $entries = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com");
+        $this->assertEquals(0, sizeof($entries));
+
+        // Phone ones
+        $this->mailingListService->updateSubscriptionPreferences(new GuestMailingListSubscriberPreferences([
+            "testunsubscribe" => 1
+        ], "geoff@test.com", "07545 898787"));
+
+        $key = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com")[0]->getUnsubscribeKey();
+
+
+        // Bad mobile number
+        $this->mailingListService->unsubscribeBykey($key, null, "07545 898787");
+
+        // Should still be subscribed
+        $entries = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com");
+        $this->assertEquals(1, sizeof($entries));
+
+        // Correct mobile
+        $this->mailingListService->unsubscribeBykey($key, null, $entries[0]->returnMobileHash());
+
+        $entries = MailingListSubscriber::filter("WHERE email_address = ?", "geoff@test.com");
+        $this->assertEquals(0, sizeof($entries));
 
 
     }

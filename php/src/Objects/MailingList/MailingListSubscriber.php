@@ -3,6 +3,9 @@
 
 namespace Kinimailer\Objects\MailingList;
 
+use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Security\Hash\HashProvider;
+use Kinikit\Core\Security\Hash\SHA512HashProvider;
 use Kinikit\Persistence\ORM\ActiveRecord;
 
 /**
@@ -45,6 +48,12 @@ class MailingListSubscriber extends ActiveRecord {
      */
     private $mobileNumber;
 
+
+    /**
+     * @var string
+     */
+    private $unsubscribeKey;
+
     /**
      * MailingListSubscriber constructor.
      *
@@ -60,6 +69,12 @@ class MailingListSubscriber extends ActiveRecord {
         $this->name = $name;
         $this->emailAddress = $emailAddress;
         $this->mobileNumber = $mobileNumber;
+
+        /**
+         * @var HashProvider $hashProvider
+         */
+        $hashProvider = Container::instance()->get(SHA512HashProvider::class);
+        $this->unsubscribeKey = $hashProvider->generateHash($this->emailAddress . $this->userId . rand(0, 2000000));
     }
 
 
@@ -140,6 +155,33 @@ class MailingListSubscriber extends ActiveRecord {
      */
     public function setMobileNumber($mobileNumber) {
         $this->mobileNumber = $mobileNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUnsubscribeKey() {
+        return $this->unsubscribeKey;
+    }
+
+    /**
+     * Get an email hash
+     *
+     * @return string
+     */
+    public function returnEmailHash() {
+        $hashProvider = Container::instance()->get(SHA512HashProvider::class);
+        return $hashProvider->generateHash($this->getEmailAddress());
+    }
+
+    /**
+     * Get a mobile hash
+     *
+     * @return string
+     */
+    public function returnMobileHash() {
+        $hashProvider = Container::instance()->get(SHA512HashProvider::class);
+        return $hashProvider->generateHash($this->getMobileNumber());
     }
 
 

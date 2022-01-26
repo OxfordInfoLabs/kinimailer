@@ -192,5 +192,25 @@ class MailingListService {
 
     }
 
+    /**
+     * Unsubscribe to a mailing list by unsubscribe key
+     *
+     * @param $unsubscribeKey
+     */
+    public function unsubscribeBykey($unsubscribeKey, $emailHash = null, $mobileHash = null) {
+        if (!$emailHash && !$mobileHash)
+            return;
+
+        $matches = MailingListSubscriber::filter("WHERE unsubscribe_key = ?", $unsubscribeKey);
+
+        // Compare hash values for data item
+        if (sizeof($matches) > 0) {
+            if ($matches[0]->returnEmailHash() == $emailHash || $matches[0]->returnMobileHash() == $mobileHash) {
+                $matches[0]->remove();
+            }
+        }
+
+    }
+
 
 }
