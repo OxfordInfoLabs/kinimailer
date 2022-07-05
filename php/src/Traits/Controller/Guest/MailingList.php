@@ -2,6 +2,7 @@
 
 namespace Kinimailer\Traits\Controller\Guest;
 
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Services\MailingList\MailingListService;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriber;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriberPreferences;
@@ -27,6 +28,7 @@ trait MailingList {
      * Subscribe to a single mailing list
      *
      * @http POST /subscribe/$mailingListKey
+     * @rateLimit 5
      *
      * @param string $mailingListKey
      * @param GuestMailingListSubscriber $mailingListSubscriber
@@ -38,6 +40,7 @@ trait MailingList {
             $mailingListKey => 1
         ], $mailingListSubscriber->getEmailAddress(), $mailingListSubscriber->getMobileNumber(),
             $mailingListSubscriber->getName());
+
 
         // Update subscription preferences
         $this->mailingListService->updateSubscriptionPreferences($preferences);
