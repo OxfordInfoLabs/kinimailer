@@ -1,0 +1,300 @@
+<div class="px-4 py-2 sm:flex sm:items-center sm:justify-between">
+    <input type="text"
+           class="border-gray-100 w-1/2 text-lg leading-6 font-medium text-gray-900 bg-transparent focus:border-gray-300"
+           [ngClass]="{'border-red-600': !template.title}" placeholder="Enter template title"
+           [(ngModel)]="template.title">
+    <div class="mt-3 sm:mt-0 sm:ml-4">
+        <button type="button" (click)="save()"
+                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+            Save Changes
+        </button>
+    </div>
+</div>
+
+<rsz-layout class="row top" [directions]="['bottom']" [rFlex]="true"
+            (resizeStart)="iframeResizeStart($event)" (resizeEnd)="iframeResizeEnd($event)">
+    <rsz-layout class="cell left" [directions]="['right']" [rFlex]="true"
+                (resizeStart)="iframeResizeStart($event)" (resizeEnd)="iframeResizeEnd($event)">
+        <div class="cell-contents">
+            <ngx-codemirror
+                [(ngModel)]="template.html"
+                [options]="{lineNumbers: true,theme: 'ttcn',mode: 'htmlmixed'}"
+                (ngModelChange)="sanitiseHTML($event)">
+
+            </ngx-codemirror>
+        </div>
+
+    </rsz-layout>
+    <rsz-layout class="cell" [directions]="['none']" [rFlex]="false">
+        <div class="iframe-pane loading" *ngIf="iframeLoading">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Building preview...</p>
+        </div>
+        <div class="iframe-pane" *ngIf="showIframePane"></div>
+        <iframe [srcdoc]="templateHTML" frameborder="0" (load)="iframeLoaded($event)"></iframe>
+    </rsz-layout>
+</rsz-layout>
+<rsz-layout class="row bottom" [directions]="['none']" [rFlex]="false">
+    <rsz-layout class="cell" [directions]="['none']" [rFlex]="false">
+        <div class="cell-contents bg-gray-100">
+
+            <div class="bg-white p-5 border-b border-gray-200 sm:pb-0">
+                <nav class="-mb-px flex space-x-8">
+                    <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
+                    <a href="javascript:void(0)" (click)="activeTab = 'SECTIONS'"
+                       [ngClass]="{'border-indigo-500 text-indigo-600': activeTab === 'SECTIONS'}"
+                       class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+                        Sections </a>
+                    <a href="javascript:void(0)" (click)="activeTab = 'PARAMETERS'"
+                       [ngClass]="{'border-indigo-500 text-indigo-600': activeTab === 'PARAMETERS'}"
+                       class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+                        Parameters </a>
+
+                </nav>
+            </div>
+
+            <ng-template [ngIf]="activeTab === 'SECTIONS'">
+                <div class="py-4 flex justify-between">
+                    <div class="w-1/2 mx-4">
+                        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                        Title
+                                    </th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Key
+                                    </th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Type
+                                    </th>
+                                    <th scope="col"
+                                        class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
+                                        <a href="javascript:void(0)" (click)="addSection()"
+                                           class="text-indigo-600 hover:text-indigo-900 inline-flex items-center text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                            Add Section
+                                        </a>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                <tr *ngFor="let section of template.sections; let i = index"
+                                    class="cursor-pointer hover:bg-gray-50">
+                                    <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                        (click)="setSelectedSection(section)">
+                                        {{section.title}}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                        (click)="setSelectedSection(section)">
+                                        {{section.key ? '{{' + section.key + '}' + '}' : ''}}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                        (click)="setSelectedSection(section)">
+                                        {{section.type}}
+                                    </td>
+                                    <td class="text-right relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <a href="javascript:void(0)" (click)="removeSection(i)"
+                                           class="inline-block text-red-600 hover:text-red-900">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="w-1/2 mx-4">
+                        <div *ngIf="selectedSection"
+                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Title</label>
+                                <div class="mt-1">
+                                    <input type="text" [(ngModel)]="selectedSection.title"
+                                           (ngModelChange)="updateKey($event, selectedSection)"
+                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Key</label>
+                                <div class="mt-1">
+                                    <input type="text" disabled [ngModel]="selectedSection.key"
+                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Type</label>
+                                <div class="mt-1">
+                                    <select [(ngModel)]="selectedSection.type"
+                                            class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
+                                        <option value="html">HTML</option>
+                                        <option value="external_html">External HTML</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div *ngIf="selectedSection.type === 'html'" class="sm:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700"> Default
+                                    Value </label>
+                                <div class="mt-1">
+                                    <quill-editor [(ngModel)]="selectedSection.data.value"></quill-editor>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500">Enter the initial value to be used for this
+                                    section.</p>
+                            </div>
+
+                            <ng-template [ngIf]="selectedSection.type === 'external_html'">
+                                <div class="sm:col-span-6">
+                                    <label class="block text-sm font-medium text-gray-700"> External URL </label>
+                                    <div class="mt-1">
+                                        <input type="text" [(ngModel)]="selectedSection.data.externalURL"
+                                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-6">
+                                    <label class="block text-sm font-medium text-gray-700"> XPath Selector </label>
+                                    <div class="mt-1">
+                                        <input type="text" [(ngModel)]="selectedSection.data.xPathSelector"
+                                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </ng-template>
+            <ng-template [ngIf]="activeTab === 'PARAMETERS'">
+                <div class="p-4 flex justify-between">
+                    <div class="w-1/2 mx-4">
+                        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                        Title
+                                    </th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Key
+                                    </th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Type
+                                    </th>
+                                    <th scope="col"
+                                        class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
+                                        <a href="javascript:void(0)" (click)="addParameter()"
+                                           class="text-indigo-600 hover:text-indigo-900 inline-flex items-center text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                            Add Parameter
+                                        </a>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                <tr *ngFor="let parameter of template.parameters; let i = index"
+                                    class="cursor-pointer hover:bg-gray-50">
+                                    <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                        (click)="setSelectedParameter(parameter)">
+                                        {{parameter.title}}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                        (click)="setSelectedParameter(parameter)">
+                                        {{parameter.key ? '{{' + parameter.key + '}' + '}' : ''}}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                        (click)="setSelectedParameter(parameter)">
+                                        {{parameter.type}}
+                                    </td>
+                                    <td class="text-right relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <a href="javascript:void(0)" (click)="removeParameter(i)"
+                                           class="inline-block text-red-600 hover:text-red-900">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="w-1/2 mx-4">
+                        <div *ngIf="selectedParameter"
+                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Title</label>
+                                <div class="mt-1">
+                                    <input type="text" [(ngModel)]="selectedParameter.title"
+                                           (ngModelChange)="updateKey($event, selectedParameter)"
+                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Key</label>
+                                <div class="mt-1">
+                                    <input type="text" disabled [ngModel]="selectedParameter.key"
+                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Type</label>
+                                <div class="mt-1">
+                                    <select [(ngModel)]="selectedParameter.type"
+                                            class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
+                                        <option value="TEXT">Text</option>
+                                        <option value="DATE">Date</option>
+                                        <option value="DATE_TIME">Date Time</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Value</label>
+                                <div class="mt-1">
+                                    <input type="text" [(ngModel)]="selectedParameter.value"
+                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </ng-template>
+
+        </div>
+    </rsz-layout>
+</rsz-layout>
+<div class="footer bg-gray-800 flex items-center justify-between px-4">
+    <button type="button" [routerLink]="['/templates']"
+            class="bg-gray-800 py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-200 hover:bg-gray-700">
+        Cancel
+    </button>
+    <button type="button" (click)="save()"
+            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+        Save Changes
+    </button>
+</div>

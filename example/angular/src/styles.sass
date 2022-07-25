@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss/base"
+@import "tailwindcss/components"
+@import "tailwindcss/utilities"
+
+@import '~codemirror/lib/codemirror'
+@import '~codemirror/theme/ttcn'
+
+@import '~quill/dist/quill.bubble.css'
+@import '~quill/dist/quill.snow.css'
+
+@import "sass/layout"
+@import "sass/forms"
+
+html
+    font-family: 'Lato', sans-serif
+    @apply h-full bg-gray-100
+
+body
+    @apply h-full
+
+.ql-editor
+    height: 200px
+
+mat-dialog-container
+    padding: 0 !important

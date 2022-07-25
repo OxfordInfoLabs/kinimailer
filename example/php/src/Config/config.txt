@@ -1,0 +1,15 @@
+# Config file for KiniMailer example
+
+search.paths = ../vendor/oxil/kiniauth/php/src;../vendor/oxil/kinimailer/php/src
+
+db.provider = sqlite3
+db.filename = DB/kinimailer-example.db
+db.logFile = DB/db.log
+
+login.max.attempts = 500
+login.single.session = false
+
+recaptcha.secret.key = 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+
+session.cookie.domain = WILDCARD
+session.cookie.secure = false

@@ -1,0 +1,51 @@
+<div class="p-6 bg-white border-b border-gray-200">
+    <div class="md:flex md:items-center md:justify-between md:space-x-5">
+        <div class="flex items-start flex-1">
+            <div class="pt-1.5">
+                <h1 class="text-2xl font-bold text-gray-900">Mailings</h1>
+                <p class="text-sm font-medium text-gray-500">
+                    A list of all the Mailings in your account.
+                </p>
+            </div>
+        </div>
+        <div class="flex flex-col-reverse justify-stretch">
+            <button type="button" [routerLink]="['/mailings', 0]"
+                    class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary focus:outline-none">
+                Create New Mailing
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="py-6 sm:px-6 lg:px-8">
+    <div class="mt-8 flex flex-col">
+        <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Key</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Description</th>
+                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                <span class="sr-only">Edit</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                        <tr *ngFor="let mailing of mailings">
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{mailing.title}}</td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{mailing.key}}</td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{mailing.description}}</td>
+                            <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                <a [routerLink]="['/mailings', mailing.id]" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

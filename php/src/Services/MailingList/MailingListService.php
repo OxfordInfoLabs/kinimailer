@@ -6,6 +6,7 @@ use Kiniauth\Objects\Account\Account;
 use Kiniauth\Objects\Security\User;
 use Kiniauth\Objects\Security\UserSummary;
 use Kiniauth\Services\Application\Session;
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\MailingList\MailingList;
 use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\MailingList\MailingListSummary;
@@ -70,6 +71,45 @@ class MailingListService {
 
     }
 
+    public function filterMailingLists($filterString = "", $projectKey = null, $offset = 0, $limit = 10, $accountId = Account::LOGGED_IN_ACCOUNT) {
+        $params = [];
+        if ($accountId === null) {
+            $query = "WHERE accountId IS NULL";
+        } else {
+            $query = "WHERE accountId = ?";
+            $params[] = $accountId;
+        }
+
+        if ($filterString) {
+            $query .= " AND title LIKE ?";
+            $params[] = "%$filterString%";
+        }
+
+        if ($projectKey) {
+            $query .= " AND project_key = ?";
+            $params[] = $projectKey;
+        }
+
+        $query .= " ORDER BY title LIMIT $limit OFFSET $offset";
+
+        return array_map(function($instance) {
+            /** @var MailingList $instance */
+            return $instance->returnSummary();
+        }, MailingList::filter($query, $params));
+    }
+
+
+    /**
+     * Return the subscribers for the given mailing list
+     *
+     * @param $mailingListId
+     * @param $projectKey
+     * @param $accountId
+     * @return mixed
+     */
+    public function getSubscribersForMailingList($mailingListId, $projectKey = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
+        return MailingListSubscriber::filter("WHERE mailing_list_id = ?", [$mailingListId]);
+    }
 
     /**
      * Return a boolean indicator as to whether the key is available for the supplied mailing list id (or a new one if null supplied).

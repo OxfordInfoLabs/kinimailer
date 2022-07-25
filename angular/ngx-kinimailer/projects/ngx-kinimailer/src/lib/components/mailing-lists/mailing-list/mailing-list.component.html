@@ -1,0 +1,122 @@
+<div class="p-6 bg-white border-b border-gray-200">
+    <div class="md:flex md:items-center md:justify-between md:space-x-5">
+        <div class="flex items-start flex-1">
+            <div class="pt-1.5">
+                <h1 class="text-2xl font-bold text-gray-900">Mailing List</h1>
+                <p class="text-sm font-medium text-gray-500">
+                    Create/Edit a Mailing List.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="py-6 sm:px-6 lg:px-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+            <div class="px-4 sm:px-0">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Settings</h3>
+                <p class="mt-1 text-sm text-gray-600">These are the mailing list settings.</p>
+            </div>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <div class="shadow sm:rounded-md sm:overflow-hidden">
+                <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700">Title</label>
+                            <input type="text" name="title" [(ngModel)]="mailingList.title"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700">Key</label>
+                            <input type="text" name="key" [(ngModel)]="mailingList.key"
+                                   (ngModelChange)="keyChange($event)"
+                                   [ngClass]="{'border-red-600': !proposedKeyOk && mailingList.key}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            <div class="text-red-600 text-xs" *ngIf="!proposedKeyOk && mailingList.key">The proposed key is not available
+                            </div>
+                        </div>
+
+                        <div class="col-span-6">
+                            <label class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea class="w-full" rows="3" [(ngModel)]="mailingList.description"></textarea>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" [(ngModel)]="mailingList.anonymousSignUp"
+                                           class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label class="font-medium text-gray-700">Anonymous Sign Up</label>
+                                    <p class="text-gray-500">Allow people to sign up anonymously.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <button type="button" (click)="saveMailingList()" [disabled]="!proposedKeyOk"
+                            class="disabled:opacity-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden sm:block" aria-hidden="true">
+        <div class="py-5">
+            <div class="border-t border-gray-200"></div>
+        </div>
+    </div>
+
+    <div class="mt-10 sm:mt-0">
+        <div class="md:grid md:grid-cols-3 md:gap-6">
+            <div class="md:col-span-1">
+                <div class="px-4 sm:px-0">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Subscribers</h3>
+                    <p class="mt-1 text-sm text-gray-600">These are all the subscribers to this mailing list.</p>
+                </div>
+            </div>
+            <div class="mt-5 md:mt-0 md:col-span-2">
+                <div class="shadow sm:rounded-md sm:overflow-hidden">
+                    <div class="bg-white space-y-6">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Mobile Number</th>
+                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+                                    <span class="sr-only">Edit</span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                            <tr *ngFor="let subscriber of subscribers">
+                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{subscriber.name}}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{subscriber.emailAddress}}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{subscriber.mobileNumber}}</td>
+                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                </td>
+                            </tr>
+
+                            <!-- More people... -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <button type="button"
+                                class="disabled:opacity-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Add Subscriber
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

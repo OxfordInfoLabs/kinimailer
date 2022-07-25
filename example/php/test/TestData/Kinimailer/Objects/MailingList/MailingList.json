@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "key": "general_admin",
+    "title": "General Admin Mailing List",
+    "description": "My first mailing list",
+    "anonymousSignUp": 1,
+    "accountId": 0
+  },
+  {
+    "id": 2,
+    "key": "news_letter",
+    "title": "News Letter",
+    "description": "Monthly news letter providing all the latest news from the last month.",
+    "anonymousSignUp": 1,
+    "accountId": 1
+  }
+]

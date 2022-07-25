@@ -47,7 +47,7 @@ trait MailingList {
     /**
      * One shot unsubscribe email address from mailing list
      *
-     * @http GET /$unsubscribe/email/$unsubscribeKey/$emailHash
+     * @http GET /unsubscribe/email/$unsubscribeKey/$emailHash
      *
      * @param string $unsubscribeKey
      * @param string $emailHash
@@ -59,7 +59,7 @@ trait MailingList {
     /**
      * One shot unsubscribe email address from mailing list
      *
-     * @http GET /$unsubscribe/mobile/$unsubscribeKey/$mobileHash
+     * @http GET /unsubscribe/mobile/$unsubscribeKey/$mobileHash
      *
      * @param string $unsubscribeKey
      * @param string $mobileHash

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "My First Template",
+    "sections": [
+      {
+        "key": "body",
+        "title": "Body Section",
+        "type": "html"
+      },
+      {
+        "key": "footer",
+        "title": "Footer Section",
+        "type": "html"
+      }
+    ],
+    "html": "<html><body><h1>Email Template</h1><p>Hello World</p></body></html>",
+    "accountId": 1
+  }
+]

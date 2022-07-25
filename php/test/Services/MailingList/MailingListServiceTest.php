@@ -342,4 +342,22 @@ class MailingListServiceTest extends TestBase {
 
     }
 
+    public function testCanFilterMailingListsByFilterString() {
+        AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
+
+        $this->mailingListService->saveMailingList(new MailingListSummary("filter1", "New filter 1", "My New filter mailing list 1", true));
+        $this->mailingListService->saveMailingList(new MailingListSummary("filter2", "New filter 2", "My New filter mailing list 2", true));
+        $this->mailingListService->saveMailingList(new MailingListSummary("filter3", "New filter 3", "My New filter mailing list 3", true));
+
+        $results = $this->mailingListService->filterMailingLists("New filter 1");
+
+        $this->assertEquals(1, sizeof($results));
+
+        $results = $this->mailingListService->filterMailingLists("");
+
+        $this->assertEquals(3, sizeof($results));
+
+        AuthenticationHelper::logout();
+    }
+
 }

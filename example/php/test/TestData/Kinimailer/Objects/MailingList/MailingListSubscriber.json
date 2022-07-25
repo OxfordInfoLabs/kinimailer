@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "mailingListId": 2,
+    "name": "Joe Bloggs",
+    "emailAddress": "joe@bloggs.com",
+    "mobileNumber": "01234 567890",
+    "unsubscribeKey": "123qwe"
+  },
+  {
+    "id": 2,
+    "mailingListId": 2,
+    "name": "Martin Smith",
+    "emailAddress": "martin@smith.com",
+    "mobileNumber": "01234 111222",
+    "unsubscribeKey": "2345ert"
+  },
+  {
+    "id": 3,
+    "mailingListId": 2,
+    "name": "Sam Jones",
+    "emailAddress": "sam@jones.com",
+    "mobileNumber": "01234 000999",
+    "unsubscribeKey": "567fgh"
+  },
+  {
+    "id": 4,
+    "mailingListId": 2,
+    "name": "Sally Wright",
+    "emailAddress": "sally@wright.com",
+    "mobileNumber": "01234 33334444",
+    "unsubscribeKey": "123sdf"
+  }
+]
