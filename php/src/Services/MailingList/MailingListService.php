@@ -174,7 +174,7 @@ class MailingListService {
 
             // Check for resolving user for email address / mobile number
             $matchingUsers = UserSummary::filter("WHERE parent_account_id = ? AND " . ($mailingListSubscriberPreferences->getEmailAddress() ? "email_address = ?" : "mobile_number = ?"),
-                $mailingListSubscriberPreferences->getEmailAddress() ?: $mailingListSubscriberPreferences->getMobileNumber());
+                $parentAccountId, $mailingListSubscriberPreferences->getEmailAddress() ?: $mailingListSubscriberPreferences->getMobileNumber());
 
             if (sizeof($matchingUsers)) {
                 $userId = $matchingUsers[0]->getId();
@@ -237,7 +237,7 @@ class MailingListService {
      *
      * @param $unsubscribeKey
      */
-    public function unsubscribeBykey($unsubscribeKey, $emailHash = null, $mobileHash = null) {
+    public function unsubscribeByKey($unsubscribeKey, $emailHash = null, $mobileHash = null) {
         if (!$emailHash && !$mobileHash)
             return;
 
