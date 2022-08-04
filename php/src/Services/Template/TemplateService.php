@@ -109,15 +109,14 @@ class TemplateService {
      */
     public function evaluateTemplate($templateSummary) {
         $params = [];
-        foreach ($templateSummary->getParameters() as $parameter) {
+        foreach ($templateSummary->getParameters() ?? [] as $parameter) {
             $params[$parameter->getKey()] = $parameter->getValue();
         }
 
         $sections = [];
-        foreach ($templateSummary->getSections() as $section) {
+        foreach ($templateSummary->getSections() ?? [] as $section) {
             $sections[$section->getKey()] = $section->returnHTML();
         }
-
 
         $model = [
             "params" => $params,

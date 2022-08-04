@@ -16,6 +16,11 @@ import { MailingComponent } from './components/mailings/mailing/mailing.componen
 import {MatDialogModule} from '@angular/material/dialog';
 import { NewMailingComponent } from './components/mailings/mailing/new-mailing/new-mailing.component';
 import {MatTabsModule} from '@angular/material/tabs';
+import { MailingScheduleComponent } from './components/mailings/mailing/mailing-schedule/mailing-schedule.component';
+import {MatSelectModule} from '@angular/material/select';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -26,7 +31,8 @@ import {MatTabsModule} from '@angular/material/tabs';
         TemplateComponent,
         MailingsComponent,
         MailingComponent,
-        NewMailingComponent
+        NewMailingComponent,
+        MailingScheduleComponent
     ],
     imports: [
         BrowserModule,
@@ -38,7 +44,11 @@ import {MatTabsModule} from '@angular/material/tabs';
         CodemirrorModule,
         QuillModule.forRoot(),
         MatDialogModule,
-        MatTabsModule
+        MatTabsModule,
+        MatSelectModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSnackBarModule
     ],
     exports: [
         MailingListsComponent,
@@ -46,7 +56,8 @@ import {MatTabsModule} from '@angular/material/tabs';
         TemplatesComponent,
         TemplateComponent,
         MailingsComponent,
-        MailingComponent
+        MailingComponent,
+        MailingScheduleComponent
     ]
 })
 export class NgxKinimailerModule {

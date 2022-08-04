@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {KinimailerModuleConfig} from '../ngx-kinimailer.module';
 import {HttpClient} from '@angular/common/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'
@@ -8,7 +9,8 @@ import {HttpClient} from '@angular/common/http';
 export class MailingListService {
 
     constructor(private config: KinimailerModuleConfig,
-                private http: HttpClient) {
+                private http: HttpClient,
+                private snackBar: MatSnackBar) {
     }
 
     public getMailingList(id: any) {
@@ -37,6 +39,12 @@ export class MailingListService {
 
     public saveMailingList(mailingList: any, projectKey = '') {
         return this.http.post(this.config.backendURL + '/mailingList', mailingList)
-            .toPromise();
+            .toPromise().then(res => {
+                this.snackBar.open('Mailing Successfully Saved.', null,{
+                    duration: 3000,
+                    verticalPosition: 'top'
+                });
+                return res;
+            });
     }
 }

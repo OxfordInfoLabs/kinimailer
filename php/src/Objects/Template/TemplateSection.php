@@ -4,6 +4,7 @@ namespace Kinimailer\Objects\Template;
 
 use Kinikit\Core\Binding\ObjectBinder;
 use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Template\TemplateSectionType\TemplateSectionType;
 
 class TemplateSection {
@@ -118,7 +119,7 @@ class TemplateSection {
         $objectBinder = Container::instance()->get(ObjectBinder::class);
 
         // Create a new instance of the appropriate template section type
-        $templateSectionType = $objectBinder->bindFromArray($this->data, $implementationClass);
+        $templateSectionType = $objectBinder->bindFromArray($this->data ?? [], $implementationClass);
 
         return $templateSectionType->returnHTML();
 

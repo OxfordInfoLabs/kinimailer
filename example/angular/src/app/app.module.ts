@@ -21,6 +21,7 @@ import {NgxResizableModule} from '@3dgenomes/ngx-resizable';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {CodemirrorModule} from '@ctrl/ngx-codemirror';
 import { MailingComponent } from './views/mailings/mailing/mailing.component';
+import { MailingScheduleComponent } from './views/mailings/mailing/mailing-schedule/mailing-schedule.component';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { MailingComponent } from './views/mailings/mailing/mailing.component';
         MailingsComponent,
         MailingListComponent,
         TemplateComponent,
-        MailingComponent
+        MailingComponent,
+        MailingScheduleComponent
     ],
     imports: [
         BrowserModule,

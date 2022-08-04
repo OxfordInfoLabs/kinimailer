@@ -56,7 +56,7 @@ trait Mailing {
      *
      * @http POST /
      *
-     * @param $mailingSummary
+     * @param MailingSummary $mailingSummary
      * @param $projectKey
      * @param $accountId
      * @return int|null

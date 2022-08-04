@@ -107,7 +107,6 @@ export class TemplateComponent implements OnInit {
     }
 
     public async save() {
-        console.log(this.template);
         this.templateId = await this.templateService.saveTemplate(this.template);
         if (!this.template.id) {
             window.location.href  = '/templates/' + this.templateId;

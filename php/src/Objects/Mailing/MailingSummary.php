@@ -2,6 +2,8 @@
 
 namespace Kinimailer\Objects\Mailing;
 
+use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTask;
+use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskSummary;
 use Kinikit\Persistence\ORM\ActiveRecord;
 use Kinimailer\Objects\Template\TemplateParameter;
 use Kinimailer\Objects\Template\TemplateSection;
@@ -74,6 +76,12 @@ class MailingSummary extends ActiveRecord {
     protected $mailingProfileId;
 
     /**
+     * @var ScheduledTask
+     * @manyToOne
+     */
+    protected $scheduledTask;
+
+    /**
      * @param int $id
      * @param string $title
      * @param string $key
@@ -86,7 +94,7 @@ class MailingSummary extends ActiveRecord {
      * @param mixed $emailAddresses
      * @param int $mailingProfileId
      */
-    public function __construct($id = null, $title = null, $key = null, $templateSections = null, $templateParameters = null, $templateId = null, $status = null, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfileId = null) {
+    public function __construct($id = null, $title = null, $key = null, $templateSections = null, $templateParameters = null, $templateId = null, $status = null, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfileId = null, $scheduledTask = null) {
         $this->id = $id;
         $this->title = $title;
         $this->key = $key;
@@ -98,6 +106,7 @@ class MailingSummary extends ActiveRecord {
         $this->userIds = $userIds;
         $this->emailAddresses = $emailAddresses;
         $this->mailingProfileId = $mailingProfileId;
+        $this->scheduledTask = $scheduledTask;
     }
 
     /**
