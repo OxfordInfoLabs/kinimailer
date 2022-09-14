@@ -45,7 +45,7 @@ class TemplateServiceTest extends TestBase {
         );
 
         // CREATE
-        $templateId = $this->templateService->saveTemplate($template);
+        $templateId = $this->templateService->saveTemplate($template, null, 0);
         $this->assertNotNull($templateId);
 
         // Check Account
@@ -67,7 +67,7 @@ class TemplateServiceTest extends TestBase {
             "<html><body><h1>Test Header</h1></body></html>"
         );
         $update->setId($templateId);
-        $this->templateService->saveTemplate($update);
+        $this->templateService->saveTemplate($update, null, 0);
         $this->assertEquals($update->getId(), $templateId);
         $this->assertEquals("Test Update", $update->getTitle());
 
@@ -89,7 +89,7 @@ class TemplateServiceTest extends TestBase {
         );
 
         // CREATE
-        $templateId = $this->templateService->saveTemplate($template);
+        $templateId = $this->templateService->saveTemplate($template, null, 1);
         $this->assertNotNull($templateId);
 
         // Check Account
@@ -111,7 +111,7 @@ class TemplateServiceTest extends TestBase {
             "<html><body><h1>Test Header</h1></body></html>"
         );
         $update->setId($templateId);
-        $this->templateService->saveTemplate($update);
+        $this->templateService->saveTemplate($update, null, 1);
         $this->assertEquals($update->getId(), $templateId);
         $this->assertEquals("Test Update", $update->getTitle());
 
