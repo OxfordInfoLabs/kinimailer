@@ -81,6 +81,10 @@ class MailingSummary extends ActiveRecord {
      */
     protected $scheduledTask;
 
+    const STATUS_DRAFT = "draft";
+    const STATUS_SENT = "sent";
+
+
     /**
      * @param int $id
      * @param string $title
@@ -94,7 +98,7 @@ class MailingSummary extends ActiveRecord {
      * @param mixed $emailAddresses
      * @param int $mailingProfileId
      */
-    public function __construct($id = null, $title = null, $key = null, $templateSections = null, $templateParameters = null, $templateId = null, $status = null, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfileId = null, $scheduledTask = null) {
+    public function __construct($id = null, $title = null, $key = null, $templateSections = null, $templateParameters = null, $templateId = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfileId = null, $scheduledTask = null) {
         $this->id = $id;
         $this->title = $title;
         $this->key = $key;
