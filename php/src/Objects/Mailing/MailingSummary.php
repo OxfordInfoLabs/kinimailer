@@ -7,6 +7,7 @@ use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskSummary;
 use Kinikit\Persistence\ORM\ActiveRecord;
 use Kinimailer\Objects\Template\TemplateParameter;
 use Kinimailer\Objects\Template\TemplateSection;
+use Kinimailer\Objects\Template\TemplateSummary;
 
 class MailingSummary extends ActiveRecord {
 
@@ -40,9 +41,9 @@ class MailingSummary extends ActiveRecord {
     protected $templateParameters;
 
     /**
-     * @var integer
+     * @var TemplateSummary
      */
-    protected $templateId;
+    protected $template;
 
     /**
      * @var string
@@ -71,13 +72,12 @@ class MailingSummary extends ActiveRecord {
     protected $emailAddresses;
 
     /**
-     * @var integer
+     * @var MailingProfileSummary
      */
-    protected $mailingProfileId;
+    protected $mailingProfile;
 
     /**
-     * @var ScheduledTask
-     * @manyToOne
+     * @var ScheduledTaskSummary
      */
     protected $scheduledTask;
 
@@ -91,25 +91,26 @@ class MailingSummary extends ActiveRecord {
      * @param string $key
      * @param TemplateSection[] $templateSections
      * @param TemplateParameter[] $templateParameters
-     * @param int $templateId
+     * @param TemplateSummary $templateId
      * @param string $status
      * @param mixed $mailingListIds
      * @param mixed $userIds
      * @param mixed $emailAddresses
-     * @param int $mailingProfileId
+     * @param MailingProfileSummary $mailingProfile
+     * @param ScheduledTaskSummary $scheduledTask
      */
-    public function __construct($id = null, $title = null, $key = null, $templateSections = null, $templateParameters = null, $templateId = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfileId = null, $scheduledTask = null) {
+    public function __construct($title = null, $key = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->key = $key;
         $this->templateSections = $templateSections;
         $this->templateParameters = $templateParameters;
-        $this->templateId = $templateId;
+        $this->template = $template;
         $this->status = $status;
         $this->mailingListIds = $mailingListIds;
         $this->userIds = $userIds;
         $this->emailAddresses = $emailAddresses;
-        $this->mailingProfileId = $mailingProfileId;
+        $this->mailingProfile = $mailingProfile;
         $this->scheduledTask = $scheduledTask;
     }
 
@@ -184,17 +185,17 @@ class MailingSummary extends ActiveRecord {
     }
 
     /**
-     * @return int
+     * @return TemplateSummary
      */
-    public function getTemplateId() {
-        return $this->templateId;
+    public function getTemplate() {
+        return $this->template;
     }
 
     /**
-     * @param int $templateId
+     * @param TemplateSummary $template
      */
-    public function setTemplateId($templateId) {
-        $this->templateId = $templateId;
+    public function setTemplate($template) {
+        $this->template = $template;
     }
 
     /**
@@ -254,17 +255,31 @@ class MailingSummary extends ActiveRecord {
     }
 
     /**
-     * @return int
+     * @return MailingProfileSummary
      */
-    public function getMailingProfileId() {
-        return $this->mailingProfileId;
+    public function getMailingProfile() {
+        return $this->mailingProfile;
     }
 
     /**
-     * @param int $mailingProfileId
+     * @param MailingProfileSummary $mailingProfile
      */
-    public function setMailingProfileId($mailingProfileId) {
-        $this->mailingProfileId = $mailingProfileId;
+    public function setMailingProfile($mailingProfile) {
+        $this->mailingProfile = $mailingProfile;
+    }
+
+    /**
+     * @return ScheduledTaskSummary
+     */
+    public function getScheduledTask() {
+        return $this->scheduledTask;
+    }
+
+    /**
+     * @param ScheduledTaskSummary $scheduledTask
+     */
+    public function setScheduledTask($scheduledTask) {
+        $this->scheduledTask = $scheduledTask;
     }
 
 
