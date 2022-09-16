@@ -5,6 +5,7 @@ namespace Kinimailer\Traits\Controller\Account;
 
 
 use Kiniauth\Objects\Account\Account;
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Mailing\MailingProfileSummary;
 use Kinimailer\Services\Mailing\MailingProfileService;
 
@@ -40,7 +41,7 @@ trait MailingProfile {
      * @return MailingProfileSummary[]
      */
     public function filterMailingProfiles($search = "", $projectKey = null, $offset = 0, $limit = 10) {
-        $this->mailingProfileService->filterMailingProfiles($search, $projectKey, $offset, $limit);
+        return $this->mailingProfileService->filterMailingProfiles($search, $projectKey, $offset, $limit);
     }
 
 
@@ -49,7 +50,7 @@ trait MailingProfile {
      *
      * @http POST /
      *
-     * @param MailingProfileSummary mailingProfileSummary
+     * @param MailingProfileSummary $mailingProfileSummary
      * @param string $projectKey
      *
      * @return int

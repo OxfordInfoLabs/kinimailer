@@ -3,6 +3,7 @@
 namespace Kinimailer\Traits\Controller\Account;
 
 use Kiniauth\Objects\Account\Account;
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Mailing\MailingSummary;
 use Kinimailer\Services\Mailing\MailingService;
 

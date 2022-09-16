@@ -19,6 +19,7 @@ export class MailingScheduleComponent implements OnInit {
     public months = _.range(1, 29);
     public hours = _.range(0, 24);
     public minutes = _.range(0, 60);
+    public sendImmediately = false;
 
     private mailingId: number;
 

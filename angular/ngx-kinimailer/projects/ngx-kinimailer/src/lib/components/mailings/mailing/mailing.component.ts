@@ -92,7 +92,7 @@ export class MailingComponent implements OnInit {
         if (!this.mailingId) {
             this.openNewMailingDialog(null);
         } else {
-            this.template = await this.templateService.getTemplate(this.mailing.templateId);
+            this.template = this.mailing.template || {};
             if (!Array.isArray(this.mailing.templateSections)) {
                 this.mailing.templateSections = [];
             }

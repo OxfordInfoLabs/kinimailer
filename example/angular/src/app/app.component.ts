@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ActivationEnd, Router} from '@angular/router';
+import {MatDialog} from '@angular/material/dialog';
+import {MailingProfilesComponent} from 'ngx-kinimailer';
 
 @Component({
     selector: 'app-root',
@@ -13,7 +15,9 @@ export class AppComponent implements OnInit{
 
     private routerSub: Subscription;
 
-    constructor(private router: Router) {
+    constructor(private router: Router,
+                private dialog: MatDialog) {
+
         this.routerSub = this.router.events.subscribe((e: any) => {
             const main = document.getElementById('main');
             if (main) {
@@ -32,6 +36,17 @@ export class AppComponent implements OnInit{
     }
 
     ngOnInit() {
+    }
+
+    public mailingProfiles() {
+        const dialogRef = this.dialog.open(MailingProfilesComponent, {
+            width: '1200px',
+            height: '800px'
+        });
+
+        dialogRef.afterClosed().subscribe(res => {
+
+        });
     }
 
 }

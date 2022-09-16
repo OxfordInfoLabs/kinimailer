@@ -91,7 +91,7 @@ class MailingSummary extends ActiveRecord {
      * @param string $key
      * @param TemplateSection[] $templateSections
      * @param TemplateParameter[] $templateParameters
-     * @param TemplateSummary $templateId
+     * @param TemplateSummary $template
      * @param string $status
      * @param mixed $mailingListIds
      * @param mixed $userIds

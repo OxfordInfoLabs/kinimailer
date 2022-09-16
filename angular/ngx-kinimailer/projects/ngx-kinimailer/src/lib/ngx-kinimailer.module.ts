@@ -21,6 +21,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MailingProfilesComponent } from './components/mailing-profiles/mailing-profiles.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 @NgModule({
@@ -32,7 +34,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
         MailingsComponent,
         MailingComponent,
         NewMailingComponent,
-        MailingScheduleComponent
+        MailingScheduleComponent,
+        MailingProfilesComponent
     ],
     imports: [
         BrowserModule,
@@ -48,7 +51,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
         MatSelectModule,
         MatIconModule,
         MatButtonModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatCheckboxModule
     ],
     exports: [
         MailingListsComponent,
