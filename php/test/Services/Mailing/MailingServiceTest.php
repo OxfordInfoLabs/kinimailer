@@ -69,6 +69,7 @@ class MailingServiceTest extends TestBase {
 
 
     public function setUp(): void {
+
         $this->templateService = Container::instance()->get(TemplateService::class);
         $this->mailingProfileService = Container::instance()->get(MailingProfileService::class);
         $this->longRunningTaskService = Container::instance()->get(LongRunningTaskService::class);
@@ -449,6 +450,7 @@ class MailingServiceTest extends TestBase {
 
     }
 
+
     public function testLongRunningTaskCallsProcessAndUpdatesProgress() {
 
         AuthenticationHelper::login("admin@kinicart.com", "password");
@@ -518,8 +520,8 @@ class MailingServiceTest extends TestBase {
         $longRunningTask = $this->longRunningTaskService->getStoredTaskByTaskKey("test-mailing");
         $this->assertEquals([
             [
-                'id' => 1,
-                'logSetId' => 1,
+                'id' => 9,
+                'logSetId' => 4,
                 'emailAddress' => 'mark@hello.com',
                 'mobileNumber' => null,
                 'status' => 'SENT',
@@ -527,8 +529,8 @@ class MailingServiceTest extends TestBase {
                 'associatedItemId' => 50
             ],
             [
-                'id' => 2,
-                'logSetId' => 1,
+                'id' => 10,
+                'logSetId' => 4,
                 'emailAddress' => 'james@hello.com',
                 'mobileNumber' => null,
                 'status' => 'FAILED',
