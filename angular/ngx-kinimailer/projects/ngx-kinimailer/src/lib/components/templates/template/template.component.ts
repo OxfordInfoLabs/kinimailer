@@ -114,7 +114,12 @@ export class TemplateComponent implements OnInit {
     }
 
     private async loadTemplate() {
-        this.template = await this.templateService.getTemplate(this.templateId);
+        try {
+            this.template = await this.templateService.getTemplate(this.templateId);
+        } catch (e) {
+            this.template = {sections: [], parameters: []};
+        }
+        
         if (this.template.html) {
             this.sanitiseHTML(this.template.html);
         }
