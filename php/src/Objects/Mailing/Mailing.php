@@ -35,7 +35,7 @@ class Mailing extends MailingSummary {
     /**
      * @var ScheduledTask
      * @oneToOne
-     * @childJoinColumns configuration,task_identifier=mailing
+     * @childJoinColumns configuration,task_identifier=mailing,description=Mailing
      * @saveCascade
      */
     protected $scheduledTask;
@@ -50,7 +50,6 @@ class Mailing extends MailingSummary {
         if ($mailingSummary) {
             parent::__construct(
                 $mailingSummary->getTitle(),
-                $mailingSummary->getKey(),
                 $mailingSummary->getTemplateSections(),
                 $mailingSummary->getTemplateParameters(),
                 $mailingSummary->getTemplate() ? new Template($mailingSummary->getTemplate(), $projectKey, $accountId) : null,
@@ -116,7 +115,6 @@ class Mailing extends MailingSummary {
     public function returnSummary() {
         return new MailingSummary(
             $this->title,
-            $this->key,
             $this->templateSections,
             $this->templateParameters,
             $this->template ? $this->template->returnSummary() : null,

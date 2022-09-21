@@ -92,7 +92,7 @@ class MailingListService {
 
         $query .= " ORDER BY title LIMIT $limit OFFSET $offset";
 
-        return array_map(function($instance) {
+        return array_map(function ($instance) {
             /** @var MailingList $instance */
             return $instance->returnSummary();
         }, MailingList::filter($query, $params));
@@ -107,7 +107,7 @@ class MailingListService {
      * @param $accountId
      * @return mixed
      */
-    public function getSubscribersForMailingList($mailingListId, $projectKey = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
+    public function getSubscribersForMailingList($mailingListId) {
         return MailingListSubscriber::filter("WHERE mailing_list_id = ?", [$mailingListId]);
     }
 

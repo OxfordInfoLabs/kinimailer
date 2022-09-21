@@ -22,11 +22,6 @@ class MailingSummary extends ActiveRecord {
     protected $title;
 
     /**
-     * @var string
-     */
-    protected $key;
-
-    /**
      * @var TemplateSection[]
      * @json
      * @sqlType longtext
@@ -49,6 +44,7 @@ class MailingSummary extends ActiveRecord {
      * @var string
      */
     protected $status;
+
 
     /**
      * @var mixed
@@ -81,14 +77,25 @@ class MailingSummary extends ActiveRecord {
      */
     protected $scheduledTask;
 
+
+    /**
+     * @var MailingLogSetSummary[]
+     * @oneToMany
+     * @childJoinColumns mailing_id
+     * @readOnly
+     */
+    protected $logSets;
+
+
     const STATUS_DRAFT = "draft";
+    const STATUS_SENDING = "sending";
+    const STATUS_SCHEDULED = "scheduled";
     const STATUS_SENT = "sent";
 
 
     /**
      * @param int $id
      * @param string $title
-     * @param string $key
      * @param TemplateSection[] $templateSections
      * @param TemplateParameter[] $templateParameters
      * @param TemplateSummary $template
@@ -99,10 +106,9 @@ class MailingSummary extends ActiveRecord {
      * @param MailingProfileSummary $mailingProfile
      * @param ScheduledTaskSummary $scheduledTask
      */
-    public function __construct($title = null, $key = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $id = null) {
+    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $id = null) {
         $this->id = $id;
         $this->title = $title;
-        $this->key = $key;
         $this->templateSections = $templateSections;
         $this->templateParameters = $templateParameters;
         $this->template = $template;
@@ -142,19 +148,6 @@ class MailingSummary extends ActiveRecord {
         $this->title = $title;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey() {
-        return $this->key;
-    }
-
-    /**
-     * @param string $key
-     */
-    public function setKey($key) {
-        $this->key = $key;
-    }
 
     /**
      * @return TemplateSection[]
@@ -211,6 +204,7 @@ class MailingSummary extends ActiveRecord {
     public function setStatus($status) {
         $this->status = $status;
     }
+
 
     /**
      * @return mixed
@@ -280,6 +274,20 @@ class MailingSummary extends ActiveRecord {
      */
     public function setScheduledTask($scheduledTask) {
         $this->scheduledTask = $scheduledTask;
+    }
+
+    /**
+     * @return MailingLogSetSummary[]
+     */
+    public function getLogSets() {
+        return $this->logSets;
+    }
+
+    /**
+     * @param MailingLogSetSummary[] $logSets
+     */
+    public function setLogSets($logSets) {
+        $this->logSets = $logSets;
     }
 
 
