@@ -2,6 +2,9 @@
 
 namespace Kinimailer\Objects\Template;
 
+use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Template\MustacheTemplateParser;
+use Kinikit\Core\Template\TemplateParser;
 use Kinikit\Persistence\ORM\ActiveRecord;
 
 class TemplateSummary extends ActiveRecord {
@@ -38,17 +41,28 @@ class TemplateSummary extends ActiveRecord {
     protected $html;
 
     /**
+     * Array of section keys which form the content hash for this template.
+     * if this is supplied as blank array the default hash is used
+     *
+     * @var string[]
+     * @json
+     */
+    protected $contentHashSections = [];
+
+
+    /**
      * @param $title
      * @param TemplateSection[] $sections
      * @param TemplateParameter[] $parameters
      * @param $html
      * @param $id
      */
-    public function __construct($title = null, $sections = null, $parameters = null, $html = null, $id = null) {
+    public function __construct($title = null, $sections = null, $parameters = null, $html = null, $contentHashSections = [], $id = null) {
         $this->title = $title;
         $this->sections = $sections;
         $this->parameters = $parameters;
         $this->html = $html;
+        $this->contentHashSections = $contentHashSections;
         $this->id = $id;
     }
 
@@ -122,6 +136,70 @@ class TemplateSummary extends ActiveRecord {
         $this->html = $html;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getContentHashSections() {
+        return $this->contentHashSections;
+    }
+
+    /**
+     * @param string[] $contentHashSections
+     */
+    public function setContentHashSections($contentHashSections) {
+        $this->contentHashSections = $contentHashSections;
+    }
+
+    /**
+     * @return string
+     */
+    public function returnEvaluatedTemplateText() {
+
+        // Generate the model for this template
+        $model = $this->generateModel();
+
+        // Get the template parser
+        $templateParser = Container::instance()->get(MustacheTemplateParser::class);
+        return $templateParser->parseTemplateText($this->getHtml(), $model);
+
+    }
+
+
+    /**
+     * @param TemplateParser $templateParser
+     * @return string
+     */
+    public function returnEvaluatedContentHashString() {
+        $model = $this->generateModel();
+        $contentHashString = "";
+        foreach ($this->contentHashSections as $contentHashSection) {
+            $contentHashString .= $model["sections"][$contentHashSection] ?? "";
+        }
+        return $contentHashString;
+    }
+
+
+    // Generate the model for this template summary (params and sections).
+    private function generateModel() {
+
+        $model = [];
+
+        $params = [];
+        foreach ($this->getParameters() ?? [] as $parameter) {
+            $params[$parameter->getKey()] = $parameter->getValue();
+        }
+        $model["params"] = $params;
+
+        $sections = [];
+        $templateParser = Container::instance()->get(MustacheTemplateParser::class);
+        foreach ($this->getSections() ?? [] as $section) {
+            $sections[$section->getKey()] = $templateParser->parseTemplateText($section->returnHTML(), $model);
+        }
+
+        $model["sections"] = $sections;
+
+        return $model;
+    }
 
 
 }

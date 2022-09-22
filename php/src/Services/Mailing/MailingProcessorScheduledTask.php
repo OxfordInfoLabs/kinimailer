@@ -5,6 +5,7 @@ namespace Kinimailer\Services\Mailing;
 
 
 use Kiniauth\Services\Workflow\Task\Task;
+use Kinimailer\Objects\Mailing\Mailing;
 
 class MailingProcessorScheduledTask implements Task {
 
@@ -29,6 +30,12 @@ class MailingProcessorScheduledTask implements Task {
      * @return bool|void
      */
     public function run($configuration) {
-        $this->mailingService->processMailing($configuration, true);
+        
+        // Grab the mailing and ensure that it is in scheduled status before proceeding
+        $mailing = $this->mailingService->getMailing($configuration);
+
+        if ($mailing->getStatus() == Mailing::STATUS_SCHEDULED) {
+            $this->mailingService->processMailing($configuration, true);
+        }
     }
 }

@@ -141,23 +141,12 @@ class TemplateServiceTest extends TestBase {
                 "Hello Param"
 
             )],
-            "ROGER THE RABBIT"
+            "{{sections.test_section}}{{params.test_param}}"
         );
-
-        $this->templateParser->returnValue("parseTemplateText", "I AM TRUE", [
-            "ROGER THE RABBIT", [
-                "params" => [
-                    "test_param" => "Hello Param"
-                ],
-                "sections" => [
-                    "test_section" => "<h1>Hello World</h1>"
-                ]
-            ]
-        ]);
 
         $result = $this->templateService->evaluateTemplate($template);
 
-        $this->assertEquals("I AM TRUE", $result);
+        $this->assertEquals("<h1>Hello World</h1>Hello Param", $result);
 
     }
 

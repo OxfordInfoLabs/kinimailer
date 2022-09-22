@@ -20,7 +20,7 @@ class Template extends TemplateSummary {
      */
     public function __construct($templateSummary, $projectKey = null, $accountId = null) {
         if ($templateSummary) {
-            parent::__construct($templateSummary->getTitle(), $templateSummary->getSections(), $templateSummary->getParameters(), $templateSummary->getHtml(), $templateSummary->getId());
+            parent::__construct($templateSummary->getTitle(), $templateSummary->getSections(), $templateSummary->getParameters(), $templateSummary->getHtml(), $templateSummary->getContentHashSections(), $templateSummary->getId());
         }
         $this->projectKey = $projectKey;
         $this->accountId = $accountId;
@@ -55,6 +55,6 @@ class Template extends TemplateSummary {
     }
 
     public function returnSummary() {
-        return new TemplateSummary($this->getTitle(), $this->getSections(), $this->getParameters(), $this->getHtml(), $this->getId());
+        return new TemplateSummary($this->getTitle(), $this->getSections(), $this->getParameters(), $this->getHtml(), $this->getContentHashSections(), $this->getId());
     }
 }

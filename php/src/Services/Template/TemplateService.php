@@ -12,18 +12,6 @@ use Kinimailer\Objects\Template\TemplateSummary;
 
 class TemplateService {
 
-    /**
-     * @var MustacheTemplateParser
-     */
-    private $templateParser;
-
-    /**
-     * @param MustacheTemplateParser $templateParser
-     */
-    public function __construct(MustacheTemplateParser $templateParser) {
-        $this->templateParser = $templateParser;
-    }
-
 
     /**
      * Return a template summary by ID, or a new one if not found.
@@ -108,21 +96,6 @@ class TemplateService {
      * @return string
      */
     public function evaluateTemplate($templateSummary) {
-        $params = [];
-        foreach ($templateSummary->getParameters() ?? [] as $parameter) {
-            $params[$parameter->getKey()] = $parameter->getValue();
-        }
-
-        $sections = [];
-        foreach ($templateSummary->getSections() ?? [] as $section) {
-            $sections[$section->getKey()] = $section->returnHTML();
-        }
-
-        $model = [
-            "params" => $params,
-            "sections" => $sections
-        ];
-
-        return $this->templateParser->parseTemplateText($templateSummary->getHtml(), $model);
+        return $templateSummary->returnEvaluatedTemplateText();
     }
 }

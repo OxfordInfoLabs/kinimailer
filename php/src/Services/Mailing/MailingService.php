@@ -8,6 +8,7 @@ use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTask;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
 use Kinimailer\Objects\Mailing\Mailing;
+use Kinimailer\Objects\Mailing\MailingEmail;
 use Kinimailer\Objects\Mailing\MailingLogEntry;
 use Kinimailer\Objects\Mailing\MailingLogSet;
 use Kinimailer\Objects\Mailing\MailingSummary;
@@ -196,7 +197,7 @@ class MailingService {
             // Add log entries as we go.
             $longRunningData = [];
             foreach ($emailAddresses as $emailAddress) {
-                $email = new Email($fromAddress, [$emailAddress], $mailing->getTitle(), $evaluatedHTML, null, null, $replyToAddress);
+                $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template);
                 $response = $this->emailService->send($email, $mailing->getAccountId());
                 $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
                 $logEntry->save();
