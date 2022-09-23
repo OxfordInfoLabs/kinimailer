@@ -3,8 +3,10 @@
 namespace Kinimailer\Traits\Controller\Account;
 
 use Kiniauth\Objects\Account\Account;
+use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Mailing\MailingSummary;
+use Kinimailer\Services\Mailing\MailingProcessorLongRunningTask;
 use Kinimailer\Services\Mailing\MailingService;
 
 trait Mailing {
@@ -14,11 +16,19 @@ trait Mailing {
      */
     private $mailingService;
 
+
+    /**
+     * @var LongRunningTaskService
+     */
+    private $longRunningTaskService;
+
     /**
      * @param MailingService $mailingService
+     * @param LongRunningTaskService $longRunningTaskService
      */
-    public function __construct($mailingService) {
+    public function __construct($mailingService, $longRunningTaskService) {
         $this->mailingService = $mailingService;
+        $this->longRunningTaskService = $longRunningTaskService;
     }
 
     /**
@@ -74,7 +84,24 @@ trait Mailing {
      * @param $id
      * @return void
      */
-    public function removeTemplate($id) {
+    public function removeMailing($id) {
         $this->mailingService->removeMailing($id);
     }
+
+
+    /**
+     * @http POST /send
+     *
+     * @param $mailingId
+     */
+    public function sendMailing($mailingId, $trackingKey, $projectKey = null, $runNow = false) {
+        $mailing = $this->mailingService->getMailing($mailingId);
+        if (!$mailing->getScheduledTask() || $runNow) {
+            $mailingTask = new MailingProcessorLongRunningTask($mailingId, $this->mailingService);
+            return $this->longRunningTaskService->startTask("Mailing", $mailingTask, $trackingKey, $projectKey);
+        } else {
+            $this->mailingService->processMailing($mailingId);
+        }
+    }
+
 }
