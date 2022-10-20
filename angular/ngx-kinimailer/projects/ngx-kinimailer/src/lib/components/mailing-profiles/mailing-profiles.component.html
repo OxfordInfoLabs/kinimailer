@@ -8,7 +8,7 @@
                 </div>
                 <div class="ml-4 mt-4 flex-shrink-0">
                     <button type="button" (click)="addMailingProfile = true"
-                            class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                            class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
                         Create Mailing Profile
                     </button>
                 </div>
@@ -24,7 +24,7 @@
                         Title</label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
                         <input type="text" [(ngModel)]="newMailingProfile.title"
-                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
+                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:max-w-xs sm:text-sm">
                     </div>
                 </div>
 
@@ -33,7 +33,7 @@
                         From Address</label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
                         <input type="email" [(ngModel)]="newMailingProfile.fromAddress"
-                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
+                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:max-w-xs sm:text-sm">
                     </div>
                 </div>
 
@@ -42,16 +42,16 @@
                         Reply To Address</label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
                         <input type="email" [(ngModel)]="newMailingProfile.replyToAddress"
-                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                               class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:text-sm">
                     </div>
                 </div>
                 <div class="py-5">
                     <div class="flex justify-end">
                         <button type="button" (click)="cancelNewMailingProfile()"
-                                class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 ">
                             Cancel</button>
                         <button type="button" (click)="saveNewMailingProfile()"
-                                class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm">
                             Save New Profile</button>
                     </div>
                 </div>

@@ -19,7 +19,7 @@ export class TemplateService {
 
     public filterTemplates(filterString = '', offset = '0', limit = '10', projectKey = '') {
         return this.http.get(this.config.backendURL + '/template', {
-            params: {filterString, offset, limit, projectKey}
+            params: {filterString, offset, limit, projectKey, accountId: this.config.accountId}
         });
     }
 

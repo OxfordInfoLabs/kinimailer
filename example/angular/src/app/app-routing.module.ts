@@ -10,6 +10,7 @@ import {TemplateComponent} from './views/templates/template/template.component';
 import {MailingsComponent} from './views/mailings/mailings.component';
 import {MailingComponent} from './views/mailings/mailing/mailing.component';
 import {MailingScheduleComponent} from './views/mailings/mailing/mailing-schedule/mailing-schedule.component';
+import {MailingStatusComponent} from './views/mailings/mailing/mailing-status/mailing-status.component';
 
 const routes: Routes = [
     {
@@ -76,6 +77,14 @@ const routes: Routes = [
     {
         path: 'mailings/:id/schedule',
         component: MailingScheduleComponent,
+        canActivate: [AuthGuard],
+        data: {
+            title: 'Mailings'
+        }
+    },
+    {
+        path: 'mailings/:id/status/:trackingKey',
+        component: MailingStatusComponent,
         canActivate: [AuthGuard],
         data: {
             title: 'Mailings'

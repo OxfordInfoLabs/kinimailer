@@ -36,7 +36,7 @@
                         </div>
                         <div class="ml-4 mt-4 flex-shrink-0">
                             <button type="button"
-                                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
                                 Create Mailing List
                             </button>
                         </div>
@@ -145,14 +145,14 @@
 
         <ng-template [ngIf]="tabGroup.selectedIndex === 2">
             <button type="button" (click)="createMailing()"
-                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
                 <ng-template [ngIf]="!mailing.id">Create Mailing</ng-template>
                 <ng-template [ngIf]="mailing.id">Save Mailing</ng-template>
             </button>
         </ng-template>
         <ng-template [ngIf]="tabGroup.selectedIndex < 2">
             <button type="button" (click)="tabGroup.selectedIndex = tabGroup.selectedIndex + 1"
-                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
                 Next
             </button>
         </ng-template>

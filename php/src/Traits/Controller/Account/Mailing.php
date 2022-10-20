@@ -3,6 +3,7 @@
 namespace Kinimailer\Traits\Controller\Account;
 
 use Kiniauth\Objects\Account\Account;
+use Kiniauth\Objects\Workflow\Task\LongRunning\StoredLongRunningTaskSummary;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Mailing\MailingSummary;
@@ -104,4 +105,17 @@ trait Mailing {
         }
     }
 
+
+    /**
+     * Retrieve results for the supplied tracking key
+     *
+     * @http GET /results/$trackingKey
+     *
+     * @param $trackingKey
+     *
+     * @return StoredLongRunningTaskSummary
+     */
+    public function retrieveMailingResults($trackingKey) {
+        return $this->longRunningTaskService->getStoredTaskByTaskKey($trackingKey);
+    }
 }

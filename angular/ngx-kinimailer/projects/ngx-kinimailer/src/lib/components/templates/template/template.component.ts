@@ -24,6 +24,7 @@ export class TemplateComponent implements OnInit {
     public activeTab = 'SECTIONS';
     public selectedSection = null;
     public selectedParameter = null;
+    public showUniqueContentSelection = true;
 
     private templateId;
 
@@ -106,6 +107,13 @@ export class TemplateComponent implements OnInit {
         section.key = _.camelCase(value);
     }
 
+    public uniqueSectionChange(event) {
+        this.showUniqueContentSelection = !event.checked;
+        if (event.checked) {
+            this.template.contentHashSections = [];
+        }
+    }
+
     public async save() {
         this.templateId = await this.templateService.saveTemplate(this.template);
         if (!this.template.id) {
@@ -119,7 +127,7 @@ export class TemplateComponent implements OnInit {
         } catch (e) {
             this.template = {sections: [], parameters: []};
         }
-        
+
         if (this.template.html) {
             this.sanitiseHTML(this.template.html);
         }

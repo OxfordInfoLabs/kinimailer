@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MailingService} from '../../../../services/mailing.service';
 import * as _ from 'lodash';
 
@@ -24,7 +24,8 @@ export class MailingScheduleComponent implements OnInit {
     private mailingId: number;
 
     constructor(private route: ActivatedRoute,
-                private mailingService: MailingService) {
+                private mailingService: MailingService,
+                private router: Router) {
     }
 
     ngOnInit(): void {
@@ -56,15 +57,23 @@ export class MailingScheduleComponent implements OnInit {
         }
     }
 
-    public finalise() {
-
+    public async finalise() {
+        await this.save();
+        const trackingKey = 'mailing' + Date.now();
+        await this.mailingService.sendMailing(this.mailing.id, trackingKey, '', this.sendImmediately);
+        this.router.navigate(['/mailings', this.mailing.id, 'status', trackingKey]);
     }
 
     public async save() {
         if (this.mailingEmailAddresses) {
             this.mailing.emailAddresses = this.mailingEmailAddresses.split(',');
         }
-        await this.mailingService.saveMailing(this.mailing);
+        const mailing = _.cloneDeep(this.mailing);
+        if (!mailing.scheduledTask.timePeriods.length) {
+            mailing.scheduledTask = null;
+        }
+
+        this.mailing.id = await this.mailingService.saveMailing(mailing);
     }
 
     private async loadMailing(): Promise<void> {

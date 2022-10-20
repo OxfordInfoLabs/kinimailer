@@ -20,7 +20,7 @@ export class MailingProfileService {
      */
     public getMailingProfiles(search = '', offset = '0', limit = '10', projectKey = '') {
         return this.http.get(this.config.backendURL + '/mailingProfile', {
-            params: {search, offset, limit}
+            params: {search, offset, limit, accountId: this.config.accountId}
         });
     }
 

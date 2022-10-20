@@ -23,6 +23,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { MailingProfilesComponent } from './components/mailing-profiles/mailing-profiles.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MailingStatusComponent } from './components/mailings/mailing/mailing-status/mailing-status.component';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
         MailingComponent,
         NewMailingComponent,
         MailingScheduleComponent,
-        MailingProfilesComponent
+        MailingProfilesComponent,
+        MailingStatusComponent
     ],
     imports: [
         BrowserModule,
@@ -61,7 +63,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
         TemplateComponent,
         MailingsComponent,
         MailingComponent,
-        MailingScheduleComponent
+        MailingScheduleComponent,
+        MailingStatusComponent
     ]
 })
 export class NgxKinimailerModule {
@@ -77,4 +80,5 @@ export class NgxKinimailerModule {
 
 export class KinimailerModuleConfig {
     backendURL: string;
+    accountId?: number;
 }

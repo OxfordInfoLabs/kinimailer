@@ -41,6 +41,10 @@ module.exports = {
                 'secondary': '#ff4081',
                 'danger': '#f44336',
                 'success': '#4ec257'
+            },
+            borderColor: {
+                'primary': '#3f51b5',
+                'secondary': '#ff4081'
             }
         }
     },

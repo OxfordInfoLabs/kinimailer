@@ -22,6 +22,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {CodemirrorModule} from '@ctrl/ngx-codemirror';
 import { MailingComponent } from './views/mailings/mailing/mailing.component';
 import { MailingScheduleComponent } from './views/mailings/mailing/mailing-schedule/mailing-schedule.component';
+import { MailingStatusComponent } from './views/mailings/mailing/mailing-status/mailing-status.component';
 
 @NgModule({
     declarations: [
@@ -34,7 +35,8 @@ import { MailingScheduleComponent } from './views/mailings/mailing/mailing-sched
         MailingListComponent,
         TemplateComponent,
         MailingComponent,
-        MailingScheduleComponent
+        MailingScheduleComponent,
+        MailingStatusComponent
     ],
     imports: [
         BrowserModule,

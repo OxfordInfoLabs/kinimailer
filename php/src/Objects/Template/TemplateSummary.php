@@ -3,6 +3,7 @@
 namespace Kinimailer\Objects\Template;
 
 use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Logging\Logger;
 use Kinikit\Core\Template\MustacheTemplateParser;
 use Kinikit\Core\Template\TemplateParser;
 use Kinikit\Persistence\ORM\ActiveRecord;
@@ -182,23 +183,19 @@ class TemplateSummary extends ActiveRecord {
     // Generate the model for this template summary (params and sections).
     private function generateModel() {
 
-        $model = [];
-
         $params = [];
         foreach ($this->getParameters() ?? [] as $parameter) {
             $params[$parameter->getKey()] = $parameter->getValue();
         }
-        $model["params"] = $params;
 
         $sections = [];
         $templateParser = Container::instance()->get(MustacheTemplateParser::class);
         foreach ($this->getSections() ?? [] as $section) {
+            $model = ["params" => $params];
             $sections[$section->getKey()] = $templateParser->parseTemplateText($section->returnHTML(), $model);
         }
 
-        $model["sections"] = $sections;
-
-        return $model;
+        return ["params" => $params, "sections" => $sections];
     }
 
 

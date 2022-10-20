@@ -5,7 +5,7 @@
            [(ngModel)]="template.title">
     <div class="mt-3 sm:mt-0 sm:ml-4">
         <button type="button" (click)="save()"
-                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary">
             Save Changes
         </button>
     </div>
@@ -40,15 +40,19 @@
 
             <div class="bg-white p-5 border-b border-gray-200 sm:pb-0">
                 <nav class="-mb-px flex space-x-8">
-                    <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
                     <a href="javascript:void(0)" (click)="activeTab = 'SECTIONS'"
-                       [ngClass]="{'border-indigo-500 text-indigo-600': activeTab === 'SECTIONS'}"
+                       [ngClass]="{'border-primary text-primary': activeTab === 'SECTIONS'}"
                        class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
                         Sections </a>
                     <a href="javascript:void(0)" (click)="activeTab = 'PARAMETERS'"
-                       [ngClass]="{'border-indigo-500 text-indigo-600': activeTab === 'PARAMETERS'}"
+                       [ngClass]="{'border-primary text-primary': activeTab === 'PARAMETERS'}"
                        class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
                         Parameters </a>
+
+                    <a href="javascript:void(0)" (click)="activeTab = 'ADVANCED'"
+                       [ngClass]="{'border-primary text-primary': activeTab === 'ADVANCED'}"
+                       class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+                        Advanced </a>
 
                 </nav>
             </div>
@@ -73,7 +77,7 @@
                                     <th scope="col"
                                         class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
                                         <a href="javascript:void(0)" (click)="addSection()"
-                                           class="text-indigo-600 hover:text-indigo-900 inline-flex items-center text-sm">
+                                           class="text-primary hover:underline inline-flex items-center text-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -122,7 +126,7 @@
                                 <div class="mt-1">
                                     <input type="text" [(ngModel)]="selectedSection.title"
                                            (ngModelChange)="updateKey($event, selectedSection)"
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
 
@@ -130,7 +134,7 @@
                                 <label class="block text-sm font-medium text-gray-700">Key</label>
                                 <div class="mt-1">
                                     <input type="text" disabled [ngModel]="selectedSection.key"
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
 
@@ -160,14 +164,14 @@
                                     <label class="block text-sm font-medium text-gray-700"> External URL </label>
                                     <div class="mt-1">
                                         <input type="text" [(ngModel)]="selectedSection.data.externalURL"
-                                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                               class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                     </div>
                                 </div>
                                 <div class="sm:col-span-6">
                                     <label class="block text-sm font-medium text-gray-700"> XPath Selector </label>
                                     <div class="mt-1">
                                         <input type="text" [(ngModel)]="selectedSection.data.xPathSelector"
-                                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                               class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                     </div>
                                 </div>
                             </ng-template>
@@ -198,7 +202,7 @@
                                     <th scope="col"
                                         class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
                                         <a href="javascript:void(0)" (click)="addParameter()"
-                                           class="text-indigo-600 hover:text-indigo-900 inline-flex items-center text-sm">
+                                           class="text-primary hover:underline inline-flex items-center text-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -247,7 +251,7 @@
                                 <div class="mt-1">
                                     <input type="text" [(ngModel)]="selectedParameter.title"
                                            (ngModelChange)="updateKey($event, selectedParameter)"
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
 
@@ -255,7 +259,7 @@
                                 <label class="block text-sm font-medium text-gray-700">Key</label>
                                 <div class="mt-1">
                                     <input type="text" disabled [ngModel]="selectedParameter.key"
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
 
@@ -275,14 +279,35 @@
                                 <label class="block text-sm font-medium text-gray-700">Value</label>
                                 <div class="mt-1">
                                     <input type="text" [(ngModel)]="selectedParameter.value"
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
 
                         </div>
                     </div>
                 </div>
+            </ng-template>
 
+            <ng-template [ngIf]="activeTab === 'ADVANCED'">
+                <div class="p-4 flex justify-between">
+                    <div class="w-1/2 mx-4">
+                        <div class="sm:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700">Unique Sections</label>
+                            <div class="mt-1">
+                                <mat-checkbox (change)="uniqueSectionChange($event)" class="text-sm">Use all sections
+                                </mat-checkbox>
+                            </div>
+                            <ng-template [ngIf]="showUniqueContentSelection">
+                                <div class="my-2 italic">or</div>
+                                <div class="mb-2 text-sm">Select unique content sections</div>
+                                <mat-select [(ngModel)]="template.contentHashSections" multiple>
+                                    <mat-option *ngFor="let section of template.sections" [value]="section.key">
+                                        {{section.title}}</mat-option>
+                                </mat-select>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
             </ng-template>
 
         </div>
@@ -294,7 +319,7 @@
         Cancel
     </button>
     <button type="button" (click)="save()"
-            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
         Save Changes
     </button>
 </div>

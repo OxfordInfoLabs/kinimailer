@@ -19,19 +19,19 @@ export class MailingListService {
 
     public filterMailingList(filterString = '', offset = '0', limit = '10', projectKey = '') {
         return this.http.get(this.config.backendURL + '/mailingList', {
-            params: {filterString, offset, limit, projectKey}
+            params: {filterString, offset, limit, projectKey, accountId: this.config.accountId}
         });
     }
 
     public getSubscribersForMailingList(mailingListId: number) {
         return this.http.get(this.config.backendURL + '/mailingList/subscribers', {
-            params: {mailingListId}
+            params: {mailingListId, accountId: this.config.accountId}
         }).toPromise();
     }
 
     public isKeyAvailable(proposedKey: string): Promise<boolean> {
         return this.http.get(this.config.backendURL + '/mailingList/keyAvailable', {
-            params: {proposedKey}
+            params: {proposedKey, accountId: this.config.accountId}
         }).toPromise().then((res: any) => {
             return !!res;
         });
