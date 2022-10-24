@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MailingProfileService} from '../../services/mailing-profile.service';
 import {BehaviorSubject, merge, Subject} from 'rxjs';
 import {debounceTime, map, switchMap} from 'rxjs/operators';
 
@@ -13,6 +12,7 @@ export class MailingProfilesComponent implements OnInit {
     @Input() selected: any = {};
     @Input() hideFooter = false;
     @Input() allowSelection = false;
+    @Input() mailingProfileService: any;
 
     @Output() selectedChange = new EventEmitter();
 
@@ -28,7 +28,7 @@ export class MailingProfilesComponent implements OnInit {
 
     private reload = new Subject();
 
-    constructor(private mailingProfileService: MailingProfileService) {
+    constructor() {
     }
 
     ngOnInit(): void {

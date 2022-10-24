@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {MailingService} from '../../../../services/mailing.service';
 import * as _ from 'lodash';
+import {MailingProfileService} from "../../../../services/mailing-profile.service";
 
 @Component({
     selector: 'km-mailing-schedule',
@@ -25,7 +26,7 @@ export class MailingScheduleComponent implements OnInit {
 
     constructor(private route: ActivatedRoute,
                 private mailingService: MailingService,
-                private router: Router) {
+                public mailingProfileService: MailingProfileService) {
     }
 
     ngOnInit(): void {
@@ -57,23 +58,15 @@ export class MailingScheduleComponent implements OnInit {
         }
     }
 
-    public async finalise() {
-        await this.save();
-        const trackingKey = 'mailing' + Date.now();
-        await this.mailingService.sendMailing(this.mailing.id, trackingKey, '', this.sendImmediately);
-        this.router.navigate(['/mailings', this.mailing.id, 'status', trackingKey]);
+    public finalise() {
+
     }
 
     public async save() {
         if (this.mailingEmailAddresses) {
             this.mailing.emailAddresses = this.mailingEmailAddresses.split(',');
         }
-        const mailing = _.cloneDeep(this.mailing);
-        if (!mailing.scheduledTask.timePeriods.length) {
-            mailing.scheduledTask = null;
-        }
-
-        this.mailing.id = await this.mailingService.saveMailing(mailing);
+        await this.mailingService.saveMailing(this.mailing);
     }
 
     private async loadMailing(): Promise<void> {
