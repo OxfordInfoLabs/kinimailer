@@ -7,8 +7,10 @@ use Kinikit\Core\Logging\Logger;
 use Kinikit\Core\Template\MustacheTemplateParser;
 use Kinikit\Core\Template\TemplateParser;
 use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
+use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\Template\Template;
 use Kinimailer\Objects\Template\TemplateSummary;
+use Kinimailer\ValueObjects\MailingList\MailingListSubscriberSummary;
 
 class TemplateService {
 
@@ -96,6 +98,7 @@ class TemplateService {
      * @return string
      */
     public function evaluateTemplate($templateSummary) {
-        return $templateSummary->returnEvaluatedTemplateText();
+        $subscriber = new MailingListSubscriber(1, 1, "joe@bloggs.com", "07777 111111", "Joe Bloggs");
+        return $templateSummary->returnEvaluatedTemplateText($subscriber);
     }
 }

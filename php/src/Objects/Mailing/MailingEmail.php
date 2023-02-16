@@ -34,11 +34,11 @@ class MailingEmail extends Email {
      * @param TemplateSummary $template
      * @param AttachmentSummary[] $attachments
      */
-    public function __construct($from, $replyTo, $recipients, $template, $attachments = []) {
+    public function __construct($from, $replyTo, $recipients, $template, $subscriber = null, $attachments = []) {
 
         if ($template) {
             $this->template = $template;
-            parent::__construct($from, $recipients, $template->getTitle(), $template->returnEvaluatedTemplateText(),
+            parent::__construct($from, $recipients, $template->getTitle(), $template->returnEvaluatedTemplateText($subscriber),
                 null, null, $replyTo, $attachments);
         }
 

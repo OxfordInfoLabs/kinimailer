@@ -141,12 +141,12 @@ class TemplateServiceTest extends TestBase {
                 "Hello Param"
 
             )],
-            "{{sections.test_section}}{{params.test_param}}"
+            "{{sections.test_section}}{{params.test_param}} {{subscriber.name}} {{subscriber.emailAddress}} {{subscriber.unsubscribeKey}}"
         );
 
         $result = $this->templateService->evaluateTemplate($template);
 
-        $this->assertEquals("<h1>Hello World</h1>Hello Param", $result);
+        $this->assertStringStartsWith("<h1>Hello World</h1>Hello Param Joe Bloggs joe@bloggs.com", $result);
 
     }
 

@@ -8,6 +8,7 @@ use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Security\Hash\HashProvider;
 use Kinikit\Core\Security\Hash\SHA512HashProvider;
 use Kinimailer\Objects\Mailing\MailingEmail;
+use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\Template\TemplateParameter;
 use Kinimailer\Objects\Template\TemplateSection;
 use Kinimailer\Objects\Template\TemplateSummary;
@@ -26,7 +27,8 @@ class MailingEmailTest extends TestBase {
             new TemplateParameter("name", "Name", TemplateParameter::TYPE_TEXT, "Joe Bloggs")
         ], "{{sections.main}}{{sections.content}}");
 
-        $email = new MailingEmail("john@smith.com", "reply@test.com", ["test@me.com", "support@test.com"], $template);
+        $email = new MailingEmail("john@smith.com", "reply@test.com", ["test@me.com", "support@test.com"], $template,
+            new MailingListSubscriber(1, 1, "test@test"));
 
         /**
          * @var HashProvider $hashProvider
@@ -50,7 +52,7 @@ class MailingEmailTest extends TestBase {
             new TemplateParameter("name", "Name", TemplateParameter::TYPE_TEXT, "Joe Bloggs")
         ], "{{sections.main}}{{sections.content}}", ["content"]);
 
-        $email = new MailingEmail("john@smith.com", "reply@test.com", ["test@me.com", "support@test.com"], $template);
+        $email = new MailingEmail("john@smith.com", "reply@test.com", ["test@me.com", "support@test.com"], $template, new MailingListSubscriber(1, 1, "joe@bloggs.com"));
 
         /**
          * @var HashProvider $hashProvider

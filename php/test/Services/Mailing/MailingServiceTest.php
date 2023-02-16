@@ -150,7 +150,7 @@ class MailingServiceTest extends TestBase {
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template,null), 0
             ]);
 
 

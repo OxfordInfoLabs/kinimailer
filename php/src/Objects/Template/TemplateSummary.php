@@ -7,6 +7,8 @@ use Kinikit\Core\Logging\Logger;
 use Kinikit\Core\Template\MustacheTemplateParser;
 use Kinikit\Core\Template\TemplateParser;
 use Kinikit\Persistence\ORM\ActiveRecord;
+use Kinimailer\Objects\MailingList\MailingListSubscriber;
+use Kinimailer\ValueObjects\MailingList\MailingListSubscriberSummary;
 
 class TemplateSummary extends ActiveRecord {
 
@@ -152,12 +154,14 @@ class TemplateSummary extends ActiveRecord {
     }
 
     /**
+     * @param MailingListSubscriber $subscriber
+     *
      * @return string
      */
-    public function returnEvaluatedTemplateText() {
+    public function returnEvaluatedTemplateText($subscriber) {
 
         // Generate the model for this template
-        $model = $this->generateModel();
+        $model = $this->generateModel($subscriber);
 
         // Get the template parser
         $templateParser = Container::instance()->get(MustacheTemplateParser::class);
@@ -181,7 +185,7 @@ class TemplateSummary extends ActiveRecord {
 
 
     // Generate the model for this template summary (params and sections).
-    private function generateModel() {
+    private function generateModel($subscriber = null) {
 
         $params = [];
         foreach ($this->getParameters() ?? [] as $parameter) {
@@ -195,7 +199,11 @@ class TemplateSummary extends ActiveRecord {
             $sections[$section->getKey()] = $templateParser->parseTemplateText($section->returnHTML(), $model);
         }
 
-        return ["params" => $params, "sections" => $sections];
+        if ($subscriber) {
+            $subscriber = new MailingListSubscriberSummary($subscriber);
+        }
+
+        return ["params" => $params, "sections" => $sections, "subscriber" => $subscriber];
     }
 
 

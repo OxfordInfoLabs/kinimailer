@@ -6,6 +6,7 @@ use Kiniauth\Objects\Account\Account;
 use Kiniauth\Services\Communication\Email\EmailService;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTask;
 use Kinikit\Core\Communication\Email\Email;
+use Kinikit\Core\Util\ObjectArrayUtils;
 use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
 use Kinimailer\Objects\Mailing\Mailing;
 use Kinimailer\Objects\Mailing\MailingEmail;
@@ -137,7 +138,7 @@ class MailingService {
      *
      * @param integer $mailingId
      * @param boolean $runNow
-     * @param LongRunningTask $longRunningTask
+     * @param LongRunningTask $longRunningTaskka_contact
      */
     public function processMailing($mailingId, $runNow = false, $longRunningTask = null) {
 
@@ -159,13 +160,14 @@ class MailingService {
             $template->setParameters($mailing->getTemplateParameters());
             $template->setSections($mailing->getTemplateSections());
 
-            $evaluatedHTML = $this->templateService->evaluateTemplate($template);
-
             // If adhoc email addresses, merge these into the set
             $emailAddresses = [];
             if ($mailing->getEmailAddresses()) {
                 $emailAddresses = array_merge($emailAddresses, $mailing->getEmailAddresses());
             }
+
+            // Index all subscribers by email for use later
+            $subscribersByEmail = [];
 
             // If mailing list Ids, merge in subscriber email addresses
             if ($mailing->getMailingListIds()) {
@@ -179,6 +181,9 @@ class MailingService {
                         }
                     }, $subscribers);
                     $emailAddresses = array_merge($emailAddresses, $subscriberEmails);
+
+                    // Grab subscribers by email
+                    $subscribersByEmail = array_merge($subscribersByEmail, ObjectArrayUtils::indexArrayOfObjectsByMember("emailAddress", $subscribers));
                 }
             }
 
@@ -197,7 +202,7 @@ class MailingService {
             // Add log entries as we go.
             $longRunningData = [];
             foreach ($emailAddresses as $emailAddress) {
-                $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template);
+                $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null);
                 $response = $this->emailService->send($email, $mailing->getAccountId());
                 $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
                 $logEntry->save();
