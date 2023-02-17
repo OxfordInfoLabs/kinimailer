@@ -1,5 +1,7 @@
 <?php
 
+namespace Kinimailer\Controllers\Guest;
+
 /**
  * Mailing list guest controller for subscribing / unsubscribing to mailing lists.
  *

@@ -13,6 +13,7 @@ use Kinimailer\Objects\Mailing\MailingEmail;
 use Kinimailer\Objects\Mailing\MailingLogEntry;
 use Kinimailer\Objects\Mailing\MailingLogSet;
 use Kinimailer\Objects\Mailing\MailingSummary;
+use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\Template\Template;
 use Kinimailer\Services\MailingList\MailingListService;
 use Kinimailer\Services\Template\TemplateService;
@@ -218,6 +219,58 @@ class MailingService {
         // Update mailing status
         $mailing->setStatus($mailing->getScheduledTask() ? Mailing::STATUS_SCHEDULED : Mailing::STATUS_SENT);
         $mailing->save();
+
+    }
+
+
+    /**
+     * Possibly temporary method for one time mail shots
+     *
+     * @param $mailingId
+     * @param $mailingListKey
+     * @param $subscriberEmailAddress
+     *
+     * @objectInterceptorDisabled
+     */
+    public function processSingleMailingListSubscriberMailing($mailingId, $mailingListKey, $subscriberEmailAddress) {
+
+        /**
+         * @var Mailing $mailing
+         */
+        $mailing = Mailing::fetch($mailingId);
+
+        // Get Mailing list by key
+        $mailingListId = $this->mailingListService->getMailingListByKey($mailingListKey)->getId();
+
+        // Grab the subscriber
+        $subscribers = MailingListSubscriber::filter("WHERE mailingListId = ? AND emailAddress = ?", $mailingListId, $subscriberEmailAddress);
+
+        if (sizeof($subscribers)) {
+
+            $subscriber = $subscribers[0];
+
+            // Grab the template and update with mailing values
+            $template = $mailing->getTemplate();
+            $template->setParameters($mailing->getTemplateParameters());
+            $template->setSections($mailing->getTemplateSections());
+
+            // From and reply addresses
+            $fromAddress = $mailing->getMailingProfile()->getFromAddress();
+            $replyToAddress = $mailing->getMailingProfile()->getReplyToAddress();
+
+            // Create the log set
+            $logSet = new MailingLogSet($mailingId, [], $mailing->getProjectKey(), $mailing->getAccountId());
+            $logSet->save();
+
+            // Send the email
+            $email = new MailingEmail($fromAddress, $replyToAddress, [$subscriberEmailAddress], $template, $subscriber);
+            $response = $this->emailService->send($email, $mailing->getAccountId());
+
+            // Create a log entry
+            $logEntry = new MailingLogEntry($subscriberEmailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
+            $logEntry->save();
+        }
+
 
     }
 
