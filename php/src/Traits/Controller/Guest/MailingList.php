@@ -56,7 +56,7 @@ trait MailingList {
      * @param string $emailHash
      */
     public function unsubscribeEmailFromMailingList($unsubscribeKey, $emailHash = null) {
-        $this->mailingListService->unsubscribeBykey($unsubscribeKey, $emailHash);
+        return $this->mailingListService->unsubscribeBykey($unsubscribeKey, $emailHash);
     }
 
     /**
@@ -68,7 +68,7 @@ trait MailingList {
      * @param string $mobileHash
      */
     public function unsubscribeMobileFromMailingList($unsubscribeKey, $mobileHash = null) {
-        $this->mailingListService->unsubscribeBykey($unsubscribeKey, null, $mobileHash);
+        return $this->mailingListService->unsubscribeBykey($unsubscribeKey, null, $mobileHash);
     }
 
 
