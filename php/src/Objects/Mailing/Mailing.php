@@ -4,6 +4,7 @@ namespace Kinimailer\Objects\Mailing;
 
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTask;
 use Kiniauth\Traits\Account\AccountProject;
+use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Template\Template;
 
 
@@ -48,6 +49,7 @@ class Mailing extends MailingSummary {
      */
     public function __construct($mailingSummary, $projectKey = null, $accountId = null) {
         if ($mailingSummary) {
+
             parent::__construct(
                 $mailingSummary->getTitle(),
                 $mailingSummary->getTemplateSections(),

@@ -3,5 +3,5 @@
 namespace Kinimailer\Controllers\Admin;
 
 class Mailing {
-    use \Kinimailer\Traits\Controller\Account\Mailing;
+    use \Kinimailer\Traits\Controller\Admin\Mailing;
 }
