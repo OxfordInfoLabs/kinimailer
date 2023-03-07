@@ -444,6 +444,7 @@ class MailingServiceTest extends TestBase {
 
 
         // Set sending status
+        $mailing = $mailing->returnSummary();
         $mailing->setStatus(Mailing::STATUS_SENDING);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
