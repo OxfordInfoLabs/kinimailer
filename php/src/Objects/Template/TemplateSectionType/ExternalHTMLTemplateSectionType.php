@@ -14,7 +14,7 @@ class ExternalHTMLTemplateSectionType implements TemplateSectionType {
     /**
      * @var string
      */
-    private $externalXPath;
+    private $xPathSelector;
 
     /**
      * @param string $externalURL
@@ -22,7 +22,7 @@ class ExternalHTMLTemplateSectionType implements TemplateSectionType {
      */
     public function __construct($externalURL = null, $externalXPath = null) {
         $this->externalURL = $externalURL;
-        $this->externalXPath = $externalXPath;
+        $this->xPathSelector = $externalXPath;
     }
 
 
@@ -43,15 +43,15 @@ class ExternalHTMLTemplateSectionType implements TemplateSectionType {
     /**
      * @return string
      */
-    public function getExternalXPath() {
-        return $this->externalXPath;
+    public function getXPathSelector() {
+        return $this->xPathSelector;
     }
 
     /**
-     * @param string $externalXPath
+     * @param string $xPathSelector
      */
-    public function setExternalXPath($externalXPath) {
-        $this->externalXPath = $externalXPath;
+    public function setXPathSelector($xPathSelector) {
+        $this->xPathSelector = $xPathSelector;
     }
 
 
@@ -66,12 +66,11 @@ class ExternalHTMLTemplateSectionType implements TemplateSectionType {
             }
         }
 
-        if ($html && $this->externalXPath) {
+        if ($html && $this->xPathSelector) {
             $dom = new \DOMDocument();
             $dom->loadHTML($html, LIBXML_NOERROR);
-
             $xPath = new \DOMXPath($dom);
-            $xPathResult = $xPath->query($this->externalXPath);
+            $xPathResult = $xPath->query($this->xPathSelector);
             $html = $dom->saveHTML($xPathResult->item(0));
         }
 

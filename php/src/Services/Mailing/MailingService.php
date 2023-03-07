@@ -160,6 +160,7 @@ class MailingService {
             $template = $mailing->getTemplate();
             $template->setParameters($mailing->getTemplateParameters());
             $template->setSections($mailing->getTemplateSections());
+            $template->setTitle($mailing->getTitle());
 
             // If adhoc email addresses, merge these into the set
             $emailAddresses = [];

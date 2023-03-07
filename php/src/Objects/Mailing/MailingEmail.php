@@ -38,7 +38,7 @@ class MailingEmail extends Email {
 
         if ($template) {
             $this->template = $template;
-            parent::__construct($from, $recipients, $template->getTitle(), $template->returnEvaluatedTemplateText($subscriber),
+            parent::__construct($from, $recipients, $template->returnEvaluatedTemplateTitle($subscriber), $template->returnEvaluatedTemplateText($subscriber),
                 null, null, $replyTo, $attachments);
         }
 

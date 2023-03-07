@@ -158,6 +158,23 @@ class TemplateSummary extends ActiveRecord {
      *
      * @return string
      */
+    public function returnEvaluatedTemplateTitle($subscriber) {
+
+        // Generate the model for this template
+        $model = $this->generateModel($subscriber);
+
+        // Get the template parser
+        $templateParser = Container::instance()->get(MustacheTemplateParser::class);
+        return $templateParser->parseTemplateText($this->getTitle(), $model);
+
+    }
+
+
+    /**
+     * @param MailingListSubscriber $subscriber
+     *
+     * @return string
+     */
     public function returnEvaluatedTemplateText($subscriber) {
 
         // Generate the model for this template

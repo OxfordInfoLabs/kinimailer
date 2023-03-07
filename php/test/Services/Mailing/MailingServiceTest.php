@@ -144,6 +144,7 @@ class MailingServiceTest extends TestBase {
         $template = Template::fetch($templateId);
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
+        $template->setTitle("Test Mailing");
 
 
         // Programme email responses
@@ -204,7 +205,7 @@ class MailingServiceTest extends TestBase {
         $profileId = $this->mailingProfileService->saveMailingProfile($profile, null, 0);
         $profile = MailingProfile::fetch($profileId)->returnSummary();
 
-        $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+        $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
             ], null, null, $profile, null);
@@ -215,6 +216,7 @@ class MailingServiceTest extends TestBase {
         $template = Template::fetch($templateId);
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
+        $template->setTitle("Test {{params.param1}}");
 
 
         // Programme mailing list responses
@@ -359,6 +361,8 @@ class MailingServiceTest extends TestBase {
         $template = Template::fetch($templateId);
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
+        $template->setTitle("Test Mailing");
+
 
 
         // Programme email responses
@@ -485,6 +489,8 @@ class MailingServiceTest extends TestBase {
         $template = Template::fetch($templateId);
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
+        $template->setTitle("Test Mailing");
+
 
 
         // Programme email responses
