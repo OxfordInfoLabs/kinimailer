@@ -3,6 +3,7 @@
  */
 
 export * from './lib/services/mailing-list.service';
+export * from './lib/services/mailing-profile.service';
 
 export * from './lib/components/mailing-lists/mailing-lists.component';
 export * from './lib/components/mailing-lists/mailing-list/mailing-list.component';

@@ -64,7 +64,8 @@ import { MailingStatusComponent } from './components/mailings/mailing/mailing-st
         MailingsComponent,
         MailingComponent,
         MailingScheduleComponent,
-        MailingStatusComponent
+        MailingStatusComponent,
+        MailingProfilesComponent
     ]
 })
 export class NgxKinimailerModule {
@@ -80,5 +81,6 @@ export class NgxKinimailerModule {
 
 export class KinimailerModuleConfig {
     backendURL: string;
+    guestURL?: string;
     accountId?: number;
 }

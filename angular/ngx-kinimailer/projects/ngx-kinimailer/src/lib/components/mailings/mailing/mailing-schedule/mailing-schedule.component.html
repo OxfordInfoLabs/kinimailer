@@ -6,11 +6,11 @@
         </div>
         <div class="ml-4 mt-4 flex-shrink-0" *ngIf="mailing">
             <button type="button" [routerLink]="['/mailings', mailing.id]"
-                    class="relative inline-flex items-center px-4 py-2 border border-primary shadow-sm text-sm rounded-md text-primary bg-white">
+                    class="font-medium relative inline-flex items-center px-4 py-2 border shadow-sm text-sm rounded-md text-primary bg-white">
                 Back
             </button>
-            <button type="button" (click)="finalise()" [disabled]="!mailing.id"
-                    class="disabled:opacity-50 ml-3 relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
+            <button type="button" (click)="finalise()" [disabled]="!mailing.id || !mailing.mailingProfile"
+                    class="font-medium disabled:opacity-50 ml-3 relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
                 Finalise Mailing
             </button>
         </div>

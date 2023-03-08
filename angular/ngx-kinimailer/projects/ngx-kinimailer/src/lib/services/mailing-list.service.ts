@@ -47,4 +47,10 @@ export class MailingListService {
                 return res;
             });
     }
+
+    public subscribeToMailingList(mailingListKey, mailingListSubscriber) {
+        return this.http.post(this.config.guestURL + '/mailingList/subscribe/' + mailingListKey, mailingListSubscriber)
+            .toPromise();
+    }
+
 }

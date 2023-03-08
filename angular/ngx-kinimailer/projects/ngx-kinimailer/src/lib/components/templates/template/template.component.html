@@ -1,6 +1,6 @@
-<div class="px-4 py-2 sm:flex sm:items-center sm:justify-between">
+<div class="p-2 sm:flex sm:items-center sm:justify-between">
     <input type="text"
-           class="border-gray-100 w-1/2 text-lg leading-6 font-medium text-gray-900 bg-transparent focus:border-gray-300"
+           class="p-2 border-gray-100 w-1/2 text-lg leading-6 font-medium text-gray-900 bg-transparent focus:border-gray-300"
            [ngClass]="{'border-red-600': !template.title}" placeholder="Enter template title"
            [(ngModel)]="template.title">
     <div class="mt-3 sm:mt-0 sm:ml-4">
@@ -38,7 +38,7 @@
     <rsz-layout class="cell" [directions]="['none']" [rFlex]="false">
         <div class="cell-contents bg-gray-100">
 
-            <div class="bg-white p-5 border-b border-gray-200 sm:pb-0">
+            <div class="bg-white p-4 border-b border-gray-200 sm:pb-0">
                 <nav class="-mb-px flex space-x-8">
                     <a href="javascript:void(0)" (click)="activeTab = 'SECTIONS'"
                        [ngClass]="{'border-primary text-primary': activeTab === 'SECTIONS'}"
@@ -48,6 +48,11 @@
                        [ngClass]="{'border-primary text-primary': activeTab === 'PARAMETERS'}"
                        class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
                         Parameters </a>
+
+                    <a href="javascript:void(0)" (click)="activeTab = 'SUBSCRIBERS'"
+                       [ngClass]="{'border-primary text-primary': activeTab === 'SUBSCRIBERS'}"
+                       class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+                        Subscribers </a>
 
                     <a href="javascript:void(0)" (click)="activeTab = 'ADVANCED'"
                        [ngClass]="{'border-primary text-primary': activeTab === 'ADVANCED'}"
@@ -97,7 +102,7 @@
                                     </td>
                                     <td class="px-3 py-4 text-sm text-gray-500"
                                         (click)="setSelectedSection(section)">
-                                        {{section.key ? '{{' + section.key + '}' + '}' : ''}}
+                                        {{section.key ? '{{sections.' + section.key + '}' + '}' : ''}}
                                     </td>
                                     <td class="px-3 py-4 text-sm text-gray-500"
                                         (click)="setSelectedSection(section)">
@@ -222,7 +227,7 @@
                                     </td>
                                     <td class="px-3 py-4 text-sm text-gray-500"
                                         (click)="setSelectedParameter(parameter)">
-                                        {{parameter.key ? '{{' + parameter.key + '}' + '}' : ''}}
+                                        {{parameter.key ? '{{params.' + parameter.key + '}' + '}' : ''}}
                                     </td>
                                     <td class="px-3 py-4 text-sm text-gray-500"
                                         (click)="setSelectedParameter(parameter)">
@@ -283,6 +288,41 @@
                                 </div>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template [ngIf]="activeTab === 'SUBSCRIBERS'">
+                <div class="flex justify-between">
+                    <div class="w-1/2">
+                        <div class="rounded-md bg-blue-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700 font-medium">Access subscriber data</p>
+                                </div>
+                            </div>
+                            <div class="ml-8">
+                                <p class="text-sm text-blue-700">
+                                    {{'{{subscriber.name'+ '}' + '}'}}
+                                    {{'{{subscriber.emailAddress'+ '}' + '}'}}
+                                </p>
+                            </div>
+                            <div class="flex">
+                                <div class="ml-8">
+                                    <p class="text-sm text-blue-700 font-medium">Check if subscriber is a user</p>
+                                </div>
+                            </div>
+                            <div class="ml-8">
+                                <p class="text-sm text-blue-700">
+                                    {{'{{subscriber.isUser'+ '}' + '}'}}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

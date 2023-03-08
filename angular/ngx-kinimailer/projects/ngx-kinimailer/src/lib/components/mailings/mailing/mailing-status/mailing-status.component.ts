@@ -23,24 +23,28 @@ export class MailingStatusComponent implements OnInit {
         this.route.params.subscribe(async params => {
             this.mailing = await this.mailingService.getMailing(params.id);
 
-            const resultsSub = this.mailingService.getDataTrackingResults(params.trackingKey)
-                .subscribe((results: any) => {
-                    this.mailingStatus = results;
-                    if (results.status === 'COMPLETED') {
-                        resultsSub.unsubscribe();
-                    } else if (results.status === 'FAILED') {
-                        resultsSub.unsubscribe();
-                        const errorMessage = results.result;
-                        if (errorMessage) {
-                            const message = errorMessage.toLowerCase();
-                            if (!message.includes('parameter') && !message.includes('required')) {
-                                this.snackBar.open(errorMessage, 'Close', {
-                                    verticalPosition: 'top'
-                                });
+            this.mailingStatus = await this.mailingService.getDataTrackingResults(params.trackingKey);
+
+            if (this.mailingStatus.status === 'RUNNING') {
+                const resultsSub = this.mailingService.loadDataTrackingResults(params.trackingKey)
+                    .subscribe((results: any) => {
+                        this.mailingStatus = results;
+                        if (results.status === 'COMPLETED') {
+                            resultsSub.unsubscribe();
+                        } else if (results.status === 'FAILED') {
+                            resultsSub.unsubscribe();
+                            const errorMessage = results.result;
+                            if (errorMessage) {
+                                const message = errorMessage.toLowerCase();
+                                if (!message.includes('parameter') && !message.includes('required')) {
+                                    this.snackBar.open(errorMessage, 'Close', {
+                                        verticalPosition: 'top'
+                                    });
+                                }
                             }
                         }
-                    }
-                });
+                    });
+            }
 
         });
     }

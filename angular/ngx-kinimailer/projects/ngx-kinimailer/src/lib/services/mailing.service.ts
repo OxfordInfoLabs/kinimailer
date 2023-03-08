@@ -48,6 +48,10 @@ export class MailingService {
     }
 
     public getDataTrackingResults(trackingKey) {
+        return this.http.get(this.config.backendURL + `/mailing/results/${trackingKey}`).toPromise();
+    }
+
+    public loadDataTrackingResults(trackingKey) {
         return interval(2000)
             .pipe(
                 switchMap(() =>

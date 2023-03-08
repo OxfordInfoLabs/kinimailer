@@ -21,27 +21,27 @@
                 </div>
                 <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4  sm:border-gray-200 sm:pt-5">
                     <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Title</label>
+                        Title<span class="ml-0.5 text-red-500">*</span></label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
-                        <input type="text" [(ngModel)]="newMailingProfile.title"
+                        <input type="text" [(ngModel)]="newMailingProfile.title" required
                                class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:max-w-xs sm:text-sm">
                     </div>
                 </div>
 
                 <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                     <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        From Address</label>
+                        From Address<span class="ml-0.5 text-red-500">*</span></label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
-                        <input type="email" [(ngModel)]="newMailingProfile.fromAddress"
+                        <input type="email" [(ngModel)]="newMailingProfile.fromAddress" required
                                class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:max-w-xs sm:text-sm">
                     </div>
                 </div>
 
                 <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                     <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Reply To Address</label>
+                        Reply To Address<span class="ml-0.5 text-red-500">*</span></label>
                     <div class="mt-1 sm:col-span-2 sm:mt-0">
-                        <input type="email" [(ngModel)]="newMailingProfile.replyToAddress"
+                        <input type="email" [(ngModel)]="newMailingProfile.replyToAddress" required
                                class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm sm:text-sm">
                     </div>
                 </div>
@@ -51,7 +51,8 @@
                                 class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 ">
                             Cancel</button>
                         <button type="button" (click)="saveNewMailingProfile()"
-                                class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm">
+                                [disabled]="!newMailingProfile.title || !newMailingProfile.fromAddress || !newMailingProfile.replyToAddress"
+                                class="disabled:opacity-50 ml-3 inline-flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm">
                             Save New Profile</button>
                     </div>
                 </div>

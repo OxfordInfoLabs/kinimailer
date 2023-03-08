@@ -12,6 +12,8 @@ export class MailingListComponent implements OnInit {
     public mailingList: any = {};
     public proposedKeyOk = true;
     public subscribers: any = [];
+    public newSubscriber: any = {};
+    public showNewSubscriber = true;
 
     private mailingListId = null;
 
@@ -30,6 +32,18 @@ export class MailingListComponent implements OnInit {
         });
     }
 
+    public cancelNewSubscriber() {
+        this.newSubscriber = {};
+        this.showNewSubscriber = false;
+    }
+
+    public async saveNewSubscriber() {
+        await this.mailingListService.subscribeToMailingList(this.mailingList.key, this.newSubscriber);
+        this.newSubscriber = {};
+        this.showNewSubscriber = false;
+        this.loadSubscribers();
+    }
+
     public async keyChange(value: string) {
         this.proposedKeyOk = await this.mailingListService.isKeyAvailable(value);
     }
@@ -44,12 +58,14 @@ export class MailingListComponent implements OnInit {
     private async loadMailingList() {
         this.mailingListService.getMailingList(this.mailingListId).then((mailingList: any) => {
             this.mailingList = mailingList;
-            this.mailingListService.getSubscribersForMailingList(mailingList.id).then((subscribers: any) => {
-                this.subscribers = subscribers;
-            });
+            this.loadSubscribers();
         }).catch((err: any) => {
             this.mailingList = {};
         });
+    }
+
+    private async loadSubscribers() {
+        this.subscribers = await this.mailingListService.getSubscribersForMailingList(this.mailingList.id);
     }
 
 }

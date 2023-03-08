@@ -54,12 +54,8 @@
                                             <label class="block text-sm font-medium text-gray-700">
                                                 {{templateSection.title}} HTML </label>
                                             <div class="mt-1">
-                                                <ngx-codemirror class="border rounded-sm"
-                                                                [(ngModel)]="templateSection.data.value"
-                                                                [options]="{lineNumbers: true,theme: 'ttcn',mode: 'htmlmixed'}"
-                                                                (change)="sanitiseHTML()">
-
-                                                </ngx-codemirror>
+                                                <quill-editor [(ngModel)]="templateSection.data.value"
+                                                              (onBlur)="sanitiseHTML()"></quill-editor>
                                             </div>
                                         </div>
                                     </ng-template>
@@ -83,7 +79,7 @@
                                             <label class="block text-xs font-medium text-gray-700">
                                                 External HTML XPath reference </label>
                                             <div class="mt-1">
-                                                <input type="text" [(ngModel)]="templateSection.data.externalXPath"
+                                                <input type="text" [(ngModel)]="templateSection.data.xPathSelector"
                                                        (change)="sanitiseHTML()"
                                                        class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                             </div>
