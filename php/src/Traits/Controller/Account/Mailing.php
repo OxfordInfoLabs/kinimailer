@@ -68,9 +68,12 @@ trait Mailing {
      *
      * @http POST /
      *
+     * @unsanitise
+     *
      * @param MailingSummary $mailingSummary
      * @param $projectKey
      * @param $accountId
+     *
      * @return int|null
      */
     public function saveMailing($mailingSummary, $projectKey = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
