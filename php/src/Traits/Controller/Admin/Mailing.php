@@ -12,6 +12,8 @@ trait Mailing {
      *
      * @http POST /
      *
+     * @unsanitise mailingSummary
+     * 
      * @param MailingSummary $mailingSummary
      * @return int|null
      */
