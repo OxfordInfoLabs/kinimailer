@@ -211,7 +211,7 @@ class MailingService {
         $logSet->save();
 
         // Add log entries as we go.
-        $longRunningData = [];
+        $logEntries = [];
         foreach ($emailAddresses as $emailAddress) {
             $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null);
             $response = $this->emailService->send($email, $mailing->getAccountId());
@@ -219,8 +219,9 @@ class MailingService {
             $logEntry->save();
 
             if ($longRunningTask) {
-                $longRunningData[] = $logEntry;
-                $longRunningTask->updateProgress($longRunningData);
+                $logEntries[] = $logEntry;
+                $progressData = ["total" => sizeof($emailAddresses), "completed" => $logEntries];
+                $longRunningTask->updateProgress($progressData);
             }
         }
 

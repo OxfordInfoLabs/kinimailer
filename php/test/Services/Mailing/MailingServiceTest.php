@@ -599,7 +599,7 @@ class MailingServiceTest extends TestBase {
 
         // Now check that the long running task was updated
         $longRunningTask = $this->longRunningTaskService->getStoredTaskByTaskKey("test-mailing");
-        $this->assertEquals([
+        $this->assertEquals(["total" => 2, "completed" => [
             [
                 'id' => 13,
                 'logSetId' => 5,
@@ -619,7 +619,7 @@ class MailingServiceTest extends TestBase {
                 'associatedItemId' => 51
             ]
 
-        ], $longRunningTask->getProgressData());
+        ]], $longRunningTask->getProgressData());
 
     }
 
