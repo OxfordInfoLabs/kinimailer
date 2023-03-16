@@ -14,6 +14,7 @@ use Kiniauth\Test\Services\Security\AuthenticationHelper;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Testing\MockObjectProvider;
+use Kinimailer\Controllers\Account\MailingList;
 use Kinimailer\Objects\Mailing\Mailing;
 use Kinimailer\Objects\Mailing\MailingEmail;
 use Kinimailer\Objects\Mailing\MailingLogSet;
@@ -112,8 +113,16 @@ class MailingServiceTest extends TestBase {
         // Grab Mailing again
         $reMailing = $this->mailingService->getMailing($mailingId);
         $mailingSummary->getScheduledTask()->setNextStartTime($reMailing->getScheduledTask()->getNextStartTime());
+        $mailingSummary->setStatus(Mailing::STATUS_SCHEDULED);
 
         $this->assertEquals($mailingSummary, $reMailing);
+
+        $reMailing->setScheduledTask(null);
+        $this->mailingService->saveMailing($reMailing, null, 0);
+
+        $reMailing = $this->mailingService->getMailing($mailingId);
+        $this->assertEquals(Mailing::STATUS_DRAFT, $reMailing->getStatus());
+
 
     }
 
@@ -151,7 +160,7 @@ class MailingServiceTest extends TestBase {
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template,null), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template, null), 0
             ]);
 
 
@@ -298,6 +307,7 @@ class MailingServiceTest extends TestBase {
 
     public function testForScheduledMailingWithMailingListsTheyAreSentIndividuallyAndLogged() {
 
+
         AuthenticationHelper::login("admin@kinicart.com", "password");
 
         $template = new TemplateSummary("Main Title", [new TemplateSection("top", "Top Section",
@@ -312,23 +322,93 @@ class MailingServiceTest extends TestBase {
         $profileId = $this->mailingProfileService->saveMailingProfile($profile, null, 0);
         $profile = MailingProfile::fetch($profileId)->returnSummary();
 
-        $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+        $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
             ], null, null, $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
+
+        $template = Template::fetch($templateId);
+        $template->setSections($mailing->getTemplateSections());
+        $template->setParameters($mailing->getTemplateParameters());
+        $template->setTitle("Test {{params.param1}}");
+
+
+        // Programme mailing list responses
+        $this->mailingListService->returnValue("getSubscribersForMailingList", [
+            new MailingListSubscriber(1, null, "mark@test.com", null, "Mark Jones"),
+            new MailingListSubscriber(1, null, "james@test.com")
+        ], [1]);
+
+        $this->mailingListService->returnValue("getSubscribersForMailingList", [
+            new MailingListSubscriber(2, null, "peter@test.com", null, "Peter Smith"),
+            new MailingListSubscriber(2, null, "paul@test.com")
+        ], [2]);
+
+        $this->mailingListService->returnValue("getSubscribersForMailingList", [], [3]);
+
+        // Programme email responses
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
+            [
+                new MailingEmail("from@hello.com", "reply@hello.com", ["Mark Jones<mark@test.com>"], $template), 0
+            ]);
+
+
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 51),
+            [
+                new MailingEmail("from@hello.com", "reply@hello.com", ["james@test.com"], $template), 0
+            ]);
+
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 52),
+            [
+                new MailingEmail("from@hello.com", "reply@hello.com", ["Peter Smith<peter@test.com>"], $template), 0
+            ]);
+
+
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 53),
+            [
+                new MailingEmail("from@hello.com", "reply@hello.com", ["paul@test.com"], $template), 0
+            ]);
+
         // Process mailing
         $this->mailingService->processMailing($mailingId);
 
-        // Check we have changed to scheduled status
+        // Check mailing log entries stored correctly
+        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
+        $this->assertEquals(1, sizeof($mailingLogSets));
+        $logSet = $mailingLogSets[0];
+        $logEntries = $logSet->getLogEntries();
+        $this->assertEquals(4, sizeof($logEntries));
+
+        $this->assertEquals("Mark Jones<mark@test.com>", $logEntries[0]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[0]->getStatus());
+        $this->assertNull($logEntries[0]->getFailureMessage());
+        $this->assertEquals(50, $logEntries[0]->getAssociatedItemId());
+
+        $this->assertEquals("Peter Smith<peter@test.com>", $logEntries[1]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[1]->getStatus());
+        $this->assertNull($logEntries[1]->getFailureMessage());
+        $this->assertEquals(52, $logEntries[1]->getAssociatedItemId());
+
+        $this->assertEquals("james@test.com", $logEntries[2]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_FAILED, $logEntries[2]->getStatus());
+        $this->assertEquals("BAD EMAIL SEND", $logEntries[2]->getFailureMessage());
+        $this->assertEquals(51, $logEntries[2]->getAssociatedItemId());
+
+        $this->assertEquals("paul@test.com", $logEntries[3]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_FAILED, $logEntries[3]->getStatus());
+        $this->assertEquals("BAD EMAIL SEND", $logEntries[3]->getFailureMessage());
+        $this->assertEquals(53, $logEntries[3]->getAssociatedItemId());
+
+        // Check status is scheduled
         $mailing = Mailing::fetch($mailingId);
         $this->assertEquals(Mailing::STATUS_SCHEDULED, $mailing->getStatus());
-
-        // Check no mailing logs generated
-        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
-        $this->assertEquals(0, sizeof($mailingLogSets));
 
 
     }
@@ -364,7 +444,6 @@ class MailingServiceTest extends TestBase {
         $template->setTitle("Test Mailing");
 
 
-
         // Programme email responses
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
@@ -381,7 +460,7 @@ class MailingServiceTest extends TestBase {
 
 
         // Process mailing
-        $this->mailingService->processMailing($mailingId, true);
+        $this->mailingService->processMailing($mailingId);
 
         // Check mailing log entries stored correctly
         $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
@@ -427,29 +506,15 @@ class MailingServiceTest extends TestBase {
                 "mark@hello.com", "james@hello.com"
             ], $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
 
-        // Set sent status
-        $mailing->setStatus(Mailing::STATUS_SENT);
-
-        $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
-
-        $this->mailingService->processMailing($mailingId, true);
-
-        // Check no change to status
-        $mailing = Mailing::fetch($mailingId);
-        $this->assertEquals(Mailing::STATUS_SENT, $mailing->getStatus());
-
-        // Check no mailing logs generated
-        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
-        $this->assertEquals(0, sizeof($mailingLogSets));
-
 
         // Set sending status
-        $mailing = $mailing->returnSummary();
         $mailing->setStatus(Mailing::STATUS_SENDING);
 
-        $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
+        $mailing = new Mailing($mailing, null, 1);
+        $mailing->save();
+        $mailingId = $mailing->getId();
 
-        $this->mailingService->processMailing($mailingId, true);
+        $this->mailingService->processMailing($mailingId);
 
         // Check no change to status
         $mailing = Mailing::fetch($mailingId);
@@ -491,7 +556,6 @@ class MailingServiceTest extends TestBase {
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
         $template->setTitle("Test Mailing");
-
 
 
         // Programme email responses
@@ -537,8 +601,8 @@ class MailingServiceTest extends TestBase {
         $longRunningTask = $this->longRunningTaskService->getStoredTaskByTaskKey("test-mailing");
         $this->assertEquals([
             [
-                'id' => 9,
-                'logSetId' => 4,
+                'id' => 13,
+                'logSetId' => 5,
                 'emailAddress' => 'mark@hello.com',
                 'mobileNumber' => null,
                 'status' => 'SENT',
@@ -546,8 +610,8 @@ class MailingServiceTest extends TestBase {
                 'associatedItemId' => 50
             ],
             [
-                'id' => 10,
-                'logSetId' => 4,
+                'id' => 14,
+                'logSetId' => 5,
                 'emailAddress' => 'james@hello.com',
                 'mobileNumber' => null,
                 'status' => 'FAILED',

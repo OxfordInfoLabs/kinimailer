@@ -35,7 +35,7 @@ class MailingProcessorScheduledTask implements Task {
         $mailing = $this->mailingService->getMailing($configuration);
 
         if ($mailing->getStatus() == Mailing::STATUS_SCHEDULED) {
-            $this->mailingService->processMailing($configuration, true);
+            $this->mailingService->processMailing($configuration);
         }
     }
 }

@@ -116,6 +116,15 @@ class MailingService {
      */
     public function saveMailing($mailingSummary, $projectKey = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
         $mailing = new Mailing($mailingSummary, $projectKey, $accountId);
+
+        if ($mailing->getId()) {
+            $savedMailing = Mailing::fetch($mailing->getId());
+            if ($savedMailing->getStatus() != Mailing::STATUS_SENDING)
+                $mailing->setStatus($mailing->getScheduledTask() ? Mailing::STATUS_SCHEDULED : Mailing::STATUS_DRAFT);
+        } else {
+            $mailing->setStatus($mailing->getScheduledTask() ? Mailing::STATUS_SCHEDULED : Mailing::STATUS_DRAFT);
+        }
+
         $mailing->save();
         return $mailing->getId();
     }
@@ -138,84 +147,83 @@ class MailingService {
      * Process mailing using the defined rules (i.e. if it has a schedule or not)
      *
      * @param integer $mailingId
-     * @param boolean $runNow
-     * @param LongRunningTask $longRunningTaskka_contact
+     * @param LongRunningTask $longRunningTask
      */
-    public function processMailing($mailingId, $runNow = false, $longRunningTask = null) {
+    public function processMailing($mailingId, $longRunningTask = null) {
 
         /**
          * @var Mailing $mailing
          */
         $mailing = Mailing::fetch($mailingId);
 
-        // Quit while we're ahead if either sent or sending
-        if ($mailing->getStatus() == Mailing::STATUS_SENT || $mailing->getStatus() == Mailing::STATUS_SENDING)
+        // Quit while we're ahead if sending
+        if ($mailing->getStatus() == Mailing::STATUS_SENDING)
             return;
 
 
-        // If adhoc or run now passed, run now
-        if (!$mailing->getScheduledTask() || $runNow) {
+        // Set sending status
+        $mailing->setStatus(Mailing::STATUS_SENDING);
+        $mailing->save();
 
-            // Grab the template and update with mailing values
-            $template = $mailing->getTemplate();
-            $template->setParameters($mailing->getTemplateParameters());
-            $template->setSections($mailing->getTemplateSections());
-            $template->setTitle($mailing->getTitle());
+        // Grab the template and update with mailing values
+        $template = $mailing->getTemplate();
+        $template->setParameters($mailing->getTemplateParameters());
+        $template->setSections($mailing->getTemplateSections());
+        $template->setTitle($mailing->getTitle());
 
-            // If adhoc email addresses, merge these into the set
-            $emailAddresses = [];
-            if ($mailing->getEmailAddresses()) {
-                $emailAddresses = array_merge($emailAddresses, $mailing->getEmailAddresses());
-            }
-
-            // Index all subscribers by email for use later
-            $subscribersByEmail = [];
-
-            // If mailing list Ids, merge in subscriber email addresses
-            if ($mailing->getMailingListIds()) {
-                foreach ($mailing->getMailingListIds() as $mailingListId) {
-                    $subscribers = $this->mailingListService->getSubscribersForMailingList($mailingListId);
-                    $subscriberEmails = array_map(function ($subscriber) {
-                        if ($subscriber->getName()) {
-                            return $subscriber->getName() . "<" . $subscriber->getEmailAddress() . ">";
-                        } else {
-                            return $subscriber->getEmailAddress();
-                        }
-                    }, $subscribers);
-                    $emailAddresses = array_merge($emailAddresses, $subscriberEmails);
-
-                    // Grab subscribers by email
-                    $subscribersByEmail = array_merge($subscribersByEmail, ObjectArrayUtils::indexArrayOfObjectsByMember("emailAddress", $subscribers));
-                }
-            }
-
-            // From and reply addresses
-            $fromAddress = $mailing->getMailingProfile()->getFromAddress();
-            $replyToAddress = $mailing->getMailingProfile()->getReplyToAddress();
-
-            /**
-             * Loop through each email and send accordingly
-             */
-
-            // Create the log set
-            $logSet = new MailingLogSet($mailingId, [], $mailing->getProjectKey(), $mailing->getAccountId());
-            $logSet->save();
-
-            // Add log entries as we go.
-            $longRunningData = [];
-            foreach ($emailAddresses as $emailAddress) {
-                $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null);
-                $response = $this->emailService->send($email, $mailing->getAccountId());
-                $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
-                $logEntry->save();
-
-                if ($longRunningTask) {
-                    $longRunningData[] = $logEntry;
-                    $longRunningTask->updateProgress($longRunningData);
-                }
-            }
-
+        // If adhoc email addresses, merge these into the set
+        $emailAddresses = [];
+        if ($mailing->getEmailAddresses()) {
+            $emailAddresses = array_merge($emailAddresses, $mailing->getEmailAddresses());
         }
+
+        // Index all subscribers by email for use later
+        $subscribersByEmail = [];
+
+        // If mailing list Ids, merge in subscriber email addresses
+        if ($mailing->getMailingListIds()) {
+            foreach ($mailing->getMailingListIds() as $mailingListId) {
+                $subscribers = $this->mailingListService->getSubscribersForMailingList($mailingListId);
+                $subscriberEmails = array_map(function ($subscriber) {
+                    if ($subscriber->getName()) {
+                        return $subscriber->getName() . "<" . $subscriber->getEmailAddress() . ">";
+                    } else {
+                        return $subscriber->getEmailAddress();
+                    }
+                }, $subscribers);
+                $emailAddresses = array_merge($emailAddresses, $subscriberEmails);
+
+                // Grab subscribers by email
+                $subscribersByEmail = array_merge($subscribersByEmail, ObjectArrayUtils::indexArrayOfObjectsByMember("emailAddress", $subscribers));
+            }
+        }
+
+        // From and reply addresses
+        $fromAddress = $mailing->getMailingProfile()->getFromAddress();
+        $replyToAddress = $mailing->getMailingProfile()->getReplyToAddress();
+
+        /**
+         * Loop through each email and send accordingly
+         */
+
+        // Create the log set
+        $logSet = new MailingLogSet($mailingId, [], $mailing->getProjectKey(), $mailing->getAccountId());
+        $logSet->save();
+
+        // Add log entries as we go.
+        $longRunningData = [];
+        foreach ($emailAddresses as $emailAddress) {
+            $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null);
+            $response = $this->emailService->send($email, $mailing->getAccountId());
+            $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
+            $logEntry->save();
+
+            if ($longRunningTask) {
+                $longRunningData[] = $logEntry;
+                $longRunningTask->updateProgress($longRunningData);
+            }
+        }
+
 
         // Update mailing status
         $mailing->setStatus($mailing->getScheduledTask() ? Mailing::STATUS_SCHEDULED : Mailing::STATUS_SENT);

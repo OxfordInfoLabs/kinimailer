@@ -98,14 +98,9 @@ trait Mailing {
      *
      * @param $mailingId
      */
-    public function sendMailing($mailingId, $trackingKey, $projectKey = null, $runNow = false) {
-        $mailing = $this->mailingService->getMailing($mailingId);
-        if (!$mailing->getScheduledTask() || $runNow) {
-            $mailingTask = new MailingProcessorLongRunningTask($mailingId, $this->mailingService);
-            return $this->longRunningTaskService->startTask("Mailing", $mailingTask, $trackingKey, $projectKey);
-        } else {
-            $this->mailingService->processMailing($mailingId);
-        }
+    public function sendMailing($mailingId, $trackingKey, $projectKey = null) {
+        $mailingTask = new MailingProcessorLongRunningTask($mailingId, $this->mailingService);
+        return $this->longRunningTaskService->startTask("Mailing", $mailingTask, $trackingKey, $projectKey);
     }
 
 

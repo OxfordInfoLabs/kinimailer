@@ -40,6 +40,6 @@ class MailingProcessorLongRunningTask extends LongRunningTask {
     public function run() {
 
         // Process mailing
-        $this->mailingService->processMailing($this->mailingId, true, $this);
+        $this->mailingService->processMailing($this->mailingId, $this);
     }
 }
