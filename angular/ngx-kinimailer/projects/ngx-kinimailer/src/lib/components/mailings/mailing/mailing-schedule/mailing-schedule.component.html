@@ -1,200 +1,220 @@
-<div class="p-6 bg-white border-b border-gray-200">
-    <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
-        <div class="ml-4 mt-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">{{mailing ? mailing.title : ''}} Mailing</h3>
-            <p class="mt-1 text-sm text-gray-500">Create/Edit a Mailing.</p>
-        </div>
-        <div class="ml-4 mt-4 flex-shrink-0" *ngIf="mailing">
-            <button type="button" [routerLink]="['/mailings', mailing.id]"
-                    class="font-medium relative inline-flex items-center px-4 py-2 border shadow-sm text-sm rounded-md text-primary bg-white">
-                Back
-            </button>
-            <button type="button" (click)="finalise()" [disabled]="!mailing.id || !mailing.mailingProfile"
-                    class="font-medium disabled:opacity-50 ml-3 relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
-                Finalise Mailing
-            </button>
-        </div>
-    </div>
-</div>
-<div class="p-6">
-
-    <div class="mt-10 sm:mt-0">
-        <div class="md:grid md:grid-cols-3 md:gap-6">
-            <div class="md:col-span-1">
-                <div class="px-4 sm:px-0">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Additional Recipients</h3>
-                    <p class="mt-1 text-sm text-gray-600">Enter the email addresses or select the additional users to send this mailing to.</p>
+<div>
+    <div class="p-6 bg-white border-b border-gray-200">
+        <div class="md:flex md:items-center md:justify-between md:space-x-5">
+            <div class="flex items-start flex-1">
+                <div class="">
+                    <h1 class="mb-0 text-2xl font-bold text-gray-900">{{mailing ? mailing.title : ''}} Mailing</h1>
+                    <p class="mb-0 text-sm font-medium text-gray-500">
+                        Create/Edit a Mailing.
+                    </p>
                 </div>
             </div>
-            <div class="mt-5 md:mt-0 md:col-span-2">
-                <div class="shadow overflow-hidden sm:rounded-md">
-                    <div class="px-4 py-5 bg-white sm:p-6">
-                        <div class="grid grid-cols-6 gap-6">
-                            <div class="col-span-6">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Email Addresses</label>
-                                <textarea [(ngModel)]="mailingEmailAddresses"
-                                          class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
-                                <div class="text-xs text-grey-600 mt-2">Please comma separate list of email addresses</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                        <button type="button" (click)="save()"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
-                            Save
-                        </button>
+        </div>
+    </div>
+    <div class="p-6">
+
+        <div class="mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Additional Recipients</h3>
+                        <p class="mt-1 text-sm text-gray-600">Enter the email addresses or select the additional users
+                            to send this mailing to.</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="hidden sm:block" aria-hidden="true">
-        <div class="py-5">
-            <div class="border-t border-gray-200"></div>
-        </div>
-    </div>
-
-    <div class="mt-10 sm:mt-0">
-        <div class="md:grid md:grid-cols-3 md:gap-6">
-            <div class="md:col-span-1">
-                <div class="px-4 sm:px-0">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Mailing Profile</h3>
-                    <p class="mt-1 text-sm text-gray-600">Set additional pieces of information relating to the sending of the emails.</p>
-                </div>
-            </div>
-            <div class="mt-5 md:mt-0 md:col-span-2">
-                <div class="shadow overflow-hidden sm:rounded-md">
-                    <km-mailing-profiles *ngIf="mailing" [allowSelection]="true" [hideFooter]="true"
-                                         [mailingProfileService]="mailingProfileService"
-                                         [(selected)]="mailing.mailingProfile"></km-mailing-profiles>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="hidden sm:block" aria-hidden="true">
-        <div class="py-5">
-            <div class="border-t border-gray-200"></div>
-        </div>
-    </div>
-
-    <div class="mt-10 sm:mt-0">
-        <div class="md:grid md:grid-cols-3 md:gap-6">
-            <div class="md:col-span-1">
-                <div class="px-4 sm:px-0">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Scheduling</h3>
-                    <p class="mt-1 text-sm text-gray-600">Determine when the mailing will be sent to the recipients.</p>
-                </div>
-            </div>
-            <div class="mt-5 md:mt-0 md:col-span-2">
-                <div class="shadow overflow-hidden sm:rounded-md">
-                    <div class="px-4 py-5 bg-white sm:p-6">
-                        <mat-checkbox [(ngModel)]="sendImmediately" class="mb-6 text-sm block">Send Mailing Immediately</mat-checkbox>
-
-                        <div *ngIf="mailing && mailing.scheduledTask" class="">
-                            <div class="text-sm font-medium text-gray-700">Time Periods</div>
-
-                            <div class="time-period mt-4" *ngFor="let timePeriod of mailing.scheduledTask.timePeriods; let i = index">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <ng-template ngFor let-key [ngForOf]="Object.keys(timePeriod)">
-                                            <ng-template [ngIf]="key !== 'id' && timePeriod[key]">
-                                                <span class="mr-2"><span class="capitalize"><b>{{convertKey(key)}}:</b></span>&nbsp;<span>{{timePeriod[key]}}</span></span>
-                                            </ng-template>
-                                        </ng-template>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <div class="px-4 py-5 bg-white sm:p-6">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6">
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        Email Addresses</label>
+                                    <textarea [(ngModel)]="mailingEmailAddresses"
+                                              class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
+                                    <div class="text-xs text-grey-600 mt-2">Please comma separate list of email
+                                        addresses
                                     </div>
-                                    <button mat-icon-button color="warn" (click)="removeTime(i)">
-                                        <mat-icon>clear</mat-icon>
-                                    </button>
                                 </div>
                             </div>
-
-                            <button class="my-4" mat-button color="primary" (click)="addScheduleTime()">
-                                <mat-icon>more_time</mat-icon>&nbsp;Add scheduled time
-                            </button>
-
-                            <ng-template [ngIf]="showNewTaskTimePeriod">
-                                <div class="w-full bg-gray-50 p-4 mt-4">
-                                    <form #timeForm="ngForm" class="w-1/2">
-                                        <label class="mb-4 block text-sm font-medium text-gray-700">
-                                            Frequency
-                                            <mat-select #frequency="ngModel" [ngClass]="{'border-red-600': frequency.invalid}"
-                                                        [(ngModel)]="newTaskTimePeriod.frequency" name="frequency" required>
-                                                <mat-option value="Monthly">Monthly</mat-option>
-                                                <mat-option value="Weekly">Weekly</mat-option>
-                                                <mat-option value="Daily">Daily</mat-option>
-                                                <mat-option value="Hourly">Hourly</mat-option>
-                                            </mat-select>
-                                        </label>
-
-                                        <label class="mb-4 block text-sm font-medium text-gray-700" *ngIf="['Monthly'].indexOf(newTaskTimePeriod.frequency) > -1">
-                                            Day of month
-                                            <mat-select #month="ngModel" [ngClass]="{'border-red-600': month.invalid}"
-                                                        [(ngModel)]="newTaskTimePeriod.dateInMonth" name="month" required>
-                                                <mat-option [value]="day" *ngFor="let day of months">{{day}}</mat-option>
-                                            </mat-select>
-                                        </label>
-
-                                        <label class="mb-4 block text-sm font-medium text-gray-700" *ngIf="['Weekly'].indexOf(newTaskTimePeriod.frequency) > -1">
-                                            Day of week
-                                            <mat-select #week="ngModel" [ngClass]="{'border-red-600': week.invalid}"
-                                                        [(ngModel)]="newTaskTimePeriod.dayOfWeek" name="week" required>
-                                                <mat-option [value]="1">Monday</mat-option>
-                                                <mat-option [value]="2">Tuesday</mat-option>
-                                                <mat-option [value]="3">Wednesday</mat-option>
-                                                <mat-option [value]="4">Thursday</mat-option>
-                                                <mat-option [value]="5">Friday</mat-option>
-                                                <mat-option [value]="6">Saturday</mat-option>
-                                                <mat-option [value]="7">Sunday</mat-option>
-                                            </mat-select>
-                                        </label>
-
-                                        <label class="mb-4 block text-sm font-medium text-gray-700"
-                                               *ngIf="['Monthly', 'Weekly', 'Daily'].indexOf(newTaskTimePeriod.frequency) > -1">
-                                            Hour
-                                            <mat-select #hour="ngModel" [ngClass]="{'border-red-600': hour.invalid}"
-                                                        [(ngModel)]="newTaskTimePeriod.hour" name="hour" required>
-                                                <mat-option [value]="hour" *ngFor="let hour of hours">{{hour}}</mat-option>
-                                            </mat-select>
-                                        </label>
-
-                                        <label class="mb-4 block text-sm font-medium text-gray-700"
-                                               *ngIf="['Monthly', 'Weekly', 'Daily', 'Hourly'].indexOf(newTaskTimePeriod.frequency) > -1">
-                                            Minute
-                                            <mat-select #minute="ngModel" [ngClass]="{'border-red-600': minute.invalid}"
-                                                        [(ngModel)]="newTaskTimePeriod.minute" name="minute" required>
-                                                <mat-option [value]="minute" *ngFor="let minute of minutes">{{minute}}</mat-option>
-                                            </mat-select>
-                                        </label>
-
-                                        <div class="align-center justify-between">
-                                            <div></div>
-                                            <button mat-flat-button color="primary" (click)="addTimePeriod()"
-                                                    [disabled]="timeForm.invalid">Save time period
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                            </ng-template>
-
                         </div>
-                    </div>
-                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                        <button type="button" (click)="save()"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
-                            Save
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="hidden sm:block" aria-hidden="true">
+            <div class="py-5">
+                <div class="border-t border-gray-200"></div>
+            </div>
+        </div>
+
+        <div class="mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Mailing Profile</h3>
+                        <p class="mt-1 text-sm text-gray-600">Set additional pieces of information relating to the
+                            sending of the emails.</p>
+                    </div>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <km-mailing-profiles *ngIf="mailing" [allowSelection]="true" [hideFooter]="true"
+                                             [mailingProfileService]="mailingProfileService"
+                                             [(selected)]="mailing.mailingProfile"></km-mailing-profiles>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden sm:block" aria-hidden="true">
+            <div class="py-5">
+                <div class="border-t border-gray-200"></div>
+            </div>
+        </div>
+
+        <div class="mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Scheduling</h3>
+                        <p class="mt-1 text-sm text-gray-600">Determine when the mailing will be sent to the
+                            recipients.</p>
+                    </div>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <div class="px-4 py-5 bg-white sm:p-6">
+<!--                            <mat-checkbox [(ngModel)]="sendImmediately" class="mb-6 text-sm block">Send Mailing-->
+<!--                                Immediately-->
+<!--                            </mat-checkbox>-->
+
+                            <div *ngIf="mailing && mailing.scheduledTask" class="">
+                                <div class="text-sm font-medium text-gray-700">Time Periods</div>
+
+                                <div class="time-period mt-4"
+                                     *ngFor="let timePeriod of mailing.scheduledTask.timePeriods; let i = index">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <ng-template ngFor let-key [ngForOf]="Object.keys(timePeriod)">
+                                                <ng-template [ngIf]="key !== 'id' && timePeriod[key]">
+                                                    <span class="mr-2"><span class="capitalize"><b>{{convertKey(key)}}
+                                                        :</b></span>&nbsp;<span>{{timePeriod[key]}}</span></span>
+                                                </ng-template>
+                                            </ng-template>
+                                        </div>
+                                        <button mat-icon-button color="warn" (click)="removeTime(i)">
+                                            <mat-icon>clear</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button class="my-4" mat-button color="primary" (click)="addScheduleTime()">
+                                    <mat-icon>more_time</mat-icon>&nbsp;Add scheduled time
+                                </button>
+
+                                <ng-template [ngIf]="showNewTaskTimePeriod">
+                                    <div class="w-full bg-gray-50 p-4 mt-4">
+                                        <form #timeForm="ngForm" class="w-1/2">
+                                            <label class="mb-4 block text-sm font-medium text-gray-700">
+                                                Frequency
+                                                <mat-select #frequency="ngModel"
+                                                            [ngClass]="{'border-red-600': frequency.invalid}"
+                                                            [(ngModel)]="newTaskTimePeriod.frequency" name="frequency"
+                                                            required>
+                                                    <mat-option value="Monthly">Monthly</mat-option>
+                                                    <mat-option value="Weekly">Weekly</mat-option>
+                                                    <mat-option value="Daily">Daily</mat-option>
+                                                    <mat-option value="Hourly">Hourly</mat-option>
+                                                </mat-select>
+                                            </label>
+
+                                            <label class="mb-4 block text-sm font-medium text-gray-700"
+                                                   *ngIf="['Monthly'].indexOf(newTaskTimePeriod.frequency) > -1">
+                                                Day of month
+                                                <mat-select #month="ngModel"
+                                                            [ngClass]="{'border-red-600': month.invalid}"
+                                                            [(ngModel)]="newTaskTimePeriod.dateInMonth" name="month"
+                                                            required>
+                                                    <mat-option [value]="day"
+                                                                *ngFor="let day of months">{{day}}</mat-option>
+                                                </mat-select>
+                                            </label>
+
+                                            <label class="mb-4 block text-sm font-medium text-gray-700"
+                                                   *ngIf="['Weekly'].indexOf(newTaskTimePeriod.frequency) > -1">
+                                                Day of week
+                                                <mat-select #week="ngModel" [ngClass]="{'border-red-600': week.invalid}"
+                                                            [(ngModel)]="newTaskTimePeriod.dayOfWeek" name="week"
+                                                            required>
+                                                    <mat-option [value]="1">Monday</mat-option>
+                                                    <mat-option [value]="2">Tuesday</mat-option>
+                                                    <mat-option [value]="3">Wednesday</mat-option>
+                                                    <mat-option [value]="4">Thursday</mat-option>
+                                                    <mat-option [value]="5">Friday</mat-option>
+                                                    <mat-option [value]="6">Saturday</mat-option>
+                                                    <mat-option [value]="7">Sunday</mat-option>
+                                                </mat-select>
+                                            </label>
+
+                                            <label class="mb-4 block text-sm font-medium text-gray-700"
+                                                   *ngIf="['Monthly', 'Weekly', 'Daily'].indexOf(newTaskTimePeriod.frequency) > -1">
+                                                Hour
+                                                <mat-select #hour="ngModel" [ngClass]="{'border-red-600': hour.invalid}"
+                                                            [(ngModel)]="newTaskTimePeriod.hour" name="hour" required>
+                                                    <mat-option [value]="hour"
+                                                                *ngFor="let hour of hours">{{hour}}</mat-option>
+                                                </mat-select>
+                                            </label>
+
+                                            <label class="mb-4 block text-sm font-medium text-gray-700"
+                                                   *ngIf="['Monthly', 'Weekly', 'Daily', 'Hourly'].indexOf(newTaskTimePeriod.frequency) > -1">
+                                                Minute
+                                                <mat-select #minute="ngModel"
+                                                            [ngClass]="{'border-red-600': minute.invalid}"
+                                                            [(ngModel)]="newTaskTimePeriod.minute" name="minute"
+                                                            required>
+                                                    <mat-option [value]="minute"
+                                                                *ngFor="let minute of minutes">{{minute}}</mat-option>
+                                                </mat-select>
+                                            </label>
+
+                                            <div class="align-center justify-between">
+                                                <div></div>
+                                                <button mat-flat-button color="primary" (click)="addTimePeriod()"
+                                                        [disabled]="timeForm.invalid">Save time period
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </ng-template>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer h-20 bg-gray-800 flex items-center justify-between px-4">
+    <button *ngIf="mailing" type="button" [routerLink]="['/mailings', mailing.id]"
+            class="bg-gray-800 py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-200 hover:bg-gray-700">
+        Back
+    </button>
+    <div>
+        <button type="button" (click)="sendNow()"
+                class="ml-3 inline-flex justify-center py-2 px-4 border border-primary shadow-sm text-sm font-medium rounded-md text-primary bg-white">
+            Send Now
+        </button>
+        <button type="button" (click)="save()"
+                class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
+            Save Changes
+        </button>
     </div>
 
 </div>
-
-
-
 

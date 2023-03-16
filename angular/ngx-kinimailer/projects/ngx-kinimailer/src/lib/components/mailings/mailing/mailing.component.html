@@ -1,18 +1,12 @@
 <div class="p-6 bg-white border-b border-gray-200">
-    <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
-        <div class="ml-4 mt-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">{{mailing.title || ''}} Mailing</h3>
-            <p class="mt-1 text-sm text-gray-500">Create/Edit a Mailing.</p>
-        </div>
-        <div class="ml-4 mt-4 flex-shrink-0">
-            <button type="button" (click)="openNewMailingDialog(mailing)"
-                    class="relative inline-flex items-center px-4 py-2 border border-primary shadow-sm text-sm rounded-md text-primary bg-white">
-                Settings
-            </button>
-            <button type="button" (click)="next()" [disabled]="!mailing.id"
-                    class="disabled:opacity-50 ml-3 relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
-                Next
-            </button>
+    <div class="md:flex md:items-center md:justify-between md:space-x-5">
+        <div class="flex items-start flex-1">
+            <div class="">
+                <h1 class="mb-0 text-2xl font-bold text-gray-900">{{mailing.title || ''}} Mailing</h1>
+                <p class="mb-0 text-sm font-medium text-gray-500">
+                    Create/Edit a Mailing.
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -29,7 +23,6 @@
         </button>
     </div>
 </ng-template>
-
 
 <ng-template [ngIf]="mailing.id">
     <rsz-layout class="row top" [directions]="['none']" [rFlex]="false"
@@ -153,3 +146,20 @@
         </rsz-layout>
     </rsz-layout>
 </ng-template>
+<div class="footer h-20 bg-gray-800 flex items-center justify-between px-4">
+    <button type="button" [routerLink]="['/mailings']"
+            class="bg-gray-800 py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-200 hover:bg-gray-700">
+        Cancel
+    </button>
+    <div>
+        <button type="button" (click)="openNewMailingDialog(mailing)"
+                class="relative inline-flex items-center px-4 py-2 border border-primary shadow-sm text-sm rounded-md text-white bg-transparent">
+            Settings
+        </button>
+        <button type="button" (click)="next()" [disabled]="!mailing.id"
+                class="disabled:opacity-50 ml-3 relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm rounded-md text-white bg-primary">
+            Next
+        </button>
+    </div>
+
+</div>
