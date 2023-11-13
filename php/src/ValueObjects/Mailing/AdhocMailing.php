@@ -26,15 +26,11 @@ class AdhocMailing {
 
     /**
      * @var TemplateSection[]
-     * @json
-     * @sqlType longtext
      */
     protected $sections;
 
     /**
      * @var TemplateParameter[]
-     * @json
-     * @sqlType longtext
      */
     protected $parameters;
 
