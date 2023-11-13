@@ -317,7 +317,7 @@ class MailingService {
 
 
         $sendAddress = $toSubscriber->getName() ?: "";
-        $sendAddress = $sendAddress . ($toSubscriber->getName() ? "<" : "") . $toSubscriber->getEmailAddress() . ($toSubscriber->getName() ? ">" : "");
+        $sendAddress = $sendAddress . ($toSubscriber->getName() ? " <" : "") . $toSubscriber->getEmailAddress() . ($toSubscriber->getName() ? ">" : "");
 
         // Send the email
         $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber);

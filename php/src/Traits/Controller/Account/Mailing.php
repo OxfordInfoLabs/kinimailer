@@ -109,6 +109,7 @@ trait Mailing {
      * Send an adhoc mailing
      *
      * @http POST /sendAdhoc
+     * @unsanitise 
      *
      * @param AdhocMailing $adhocMailing
      */

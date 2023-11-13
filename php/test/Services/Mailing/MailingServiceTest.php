@@ -663,7 +663,7 @@ class MailingServiceTest extends TestBase {
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 55),
             [
-                new MailingEmail("from@test.com", "reply@test.com", ["Mark Test<mark@test.com>"], $template,
+                new MailingEmail("from@test.com", "reply@test.com", ["Mark Test <mark@test.com>"], $template,
                     new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test")), 0
             ]);
 
@@ -678,7 +678,7 @@ class MailingServiceTest extends TestBase {
         $logEntries = $logSet->getLogEntries();
         $this->assertEquals(1, sizeof($logEntries));
 
-        $this->assertEquals("Mark Test<mark@test.com>", $logEntries[0]->getEmailAddress());
+        $this->assertEquals("Mark Test <mark@test.com>", $logEntries[0]->getEmailAddress());
         $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[0]->getStatus());
         $this->assertNull($logEntries[0]->getFailureMessage());
         $this->assertEquals(55, $logEntries[0]->getAssociatedItemId());
