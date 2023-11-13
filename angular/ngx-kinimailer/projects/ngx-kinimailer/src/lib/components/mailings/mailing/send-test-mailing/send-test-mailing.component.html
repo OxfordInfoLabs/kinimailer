@@ -1,0 +1,79 @@
+<div class="flex flex-col h-full">
+    <div class="w-full bg-gray-100">
+        <div class="flex items-center justify-between p-6">
+            <div class="text-lg">Send Test Mailing</div>
+        </div>
+    </div>
+    <div class="flex-1">
+        <div class="p-6 space-y-6 sm:pt-10 sm:space-y-5">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Sending Details</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Information about who to send the mailing to and where
+                    to send it from.</p>
+            </div>
+            <div class="space-y-6 sm:space-y-5">
+                <div
+                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Name </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="name"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Email Address </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="emailAddress"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div
+                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Title </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="mailing.title"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div
+                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> From Name </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="fromName"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> From Email Address </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="fromAddress"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div
+                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Reply To Name </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="replyToName"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Reply To Address </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" [(ngModel)]="replyToAddress"
+                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full p-4 bg-gray-100 flex items-center justify-between">
+        <button type="button"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Close
+        </button>
+
+        <button type="button" (click)="sendTest()"
+                class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
+            Next
+        </button>
+    </div>
+</div>
+

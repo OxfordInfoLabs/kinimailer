@@ -152,8 +152,12 @@
         Cancel
     </button>
     <div>
-        <button type="button" (click)="openNewMailingDialog(mailing)"
+        <button *ngIf="mailing.id" type="button" (click)="sendTest(mailing)"
                 class="relative inline-flex items-center px-4 py-2 border border-primary shadow-sm text-sm rounded-md text-white bg-transparent">
+            Send Test
+        </button>
+        <button type="button" (click)="openNewMailingDialog(mailing)"
+                class="ml-3 relative inline-flex items-center px-4 py-2 border border-primary shadow-sm text-sm rounded-md text-white bg-transparent">
             Settings
         </button>
         <button type="button" (click)="next()" [disabled]="!mailing.id"
