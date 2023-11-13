@@ -2,7 +2,6 @@
 
 namespace Kinimailer\Traits\Controller\Guest;
 
-use Kinikit\Core\Logging\Logger;
 use Kinimailer\Services\MailingList\MailingListService;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriber;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriberPreferences;

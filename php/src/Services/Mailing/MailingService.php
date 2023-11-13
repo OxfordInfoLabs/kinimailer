@@ -15,8 +15,11 @@ use Kinimailer\Objects\Mailing\MailingLogSet;
 use Kinimailer\Objects\Mailing\MailingSummary;
 use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\Template\Template;
+use Kinimailer\Objects\Template\TemplateParameter;
+use Kinimailer\Objects\Template\TemplateSection;
 use Kinimailer\Services\MailingList\MailingListService;
 use Kinimailer\Services\Template\TemplateService;
+use Kinimailer\ValueObjects\Mailing\AdhocMailing;
 
 class MailingService {
 
@@ -234,6 +237,30 @@ class MailingService {
 
 
     /**
+     * Process an adhoc mailing to a single recipient.
+     *
+     * @param AdhocMailing $adhocMailing
+     * @return null
+     */
+    public function processAdhocMailing($adhocMailing) {
+
+        /**
+         * @var Mailing $mailing
+         */
+        $mailing = Mailing::fetch($adhocMailing->getMailingId());
+
+        /**
+         * @var MailingListSubscriber $subscriber
+         */
+        $subscriber = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
+
+        // Send the single mailing
+        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(), $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress());
+
+    }
+
+
+    /**
      * Possibly temporary method for one time mail shots
      *
      * @param $mailingId
@@ -259,29 +286,47 @@ class MailingService {
 
             $subscriber = $subscribers[0];
 
-            // Grab the template and update with mailing values
-            $template = $mailing->getTemplate();
-            $template->setParameters($mailing->getTemplateParameters());
-            $template->setSections($mailing->getTemplateSections());
-
-            // From and reply addresses
-            $fromAddress = $mailing->getMailingProfile()->getFromAddress();
-            $replyToAddress = $mailing->getMailingProfile()->getReplyToAddress();
-
-            // Create the log set
-            $logSet = new MailingLogSet($mailingId, [], $mailing->getProjectKey(), $mailing->getAccountId());
-            $logSet->save();
-
-            // Send the email
-            $email = new MailingEmail($fromAddress, $replyToAddress, [$subscriberEmailAddress], $template, $subscriber);
-            $response = $this->emailService->send($email, $mailing->getAccountId());
-
-            // Create a log entry
-            $logEntry = new MailingLogEntry($subscriberEmailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
-            $logEntry->save();
+            $this->sendSingleMailing($mailing, $subscriber, $mailing->getTitle(), $mailing->getTemplateSections(), $mailing->getTemplateParameters(), $mailing->getMailingProfile()->getFromAddress(),
+                $mailing->getMailingProfile()->getReplyToAddress());
         }
 
 
     }
+
+
+    /**
+     * @param Mailing $mailing
+     * @param MailingListSubscriber $toSubscriber
+     * @param $title
+     * @param TemplateSection[] $templateSections
+     * @param TemplateParameter[] $templateParameters
+     * @param string $fromAddress
+     * @param string $replyToAddress
+     * @return void
+     */
+    private function sendSingleMailing($mailing, $toSubscriber, $title, $templateSections, $templateParameters, $fromAddress, $replyToAddress) {
+
+        // Create the log set
+        $logSet = new MailingLogSet($mailing->getId(), [], $mailing->getProjectKey(), $mailing->getAccountId());
+        $logSet->save();
+
+        $template = $mailing->getTemplate();
+        $template->setTitle($title);
+        $template->setSections($templateSections);
+        $template->setParameters($templateParameters);
+
+
+        $sendAddress = $toSubscriber->getName() ?: "";
+        $sendAddress = $sendAddress . ($toSubscriber->getName() ? "<" : "") . $toSubscriber->getEmailAddress() . ($toSubscriber->getName() ? ">" : "");
+
+        // Send the email
+        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber);
+        $response = $this->emailService->send($email, $mailing->getAccountId());
+
+        // Create a log entry
+        $logEntry = new MailingLogEntry($sendAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
+        $logEntry->save();
+    }
+
 
 }

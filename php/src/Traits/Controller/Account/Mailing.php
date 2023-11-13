@@ -9,6 +9,7 @@ use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\Mailing\MailingSummary;
 use Kinimailer\Services\Mailing\MailingProcessorLongRunningTask;
 use Kinimailer\Services\Mailing\MailingService;
+use Kinimailer\ValueObjects\Mailing\AdhocMailing;
 
 trait Mailing {
 
@@ -101,6 +102,18 @@ trait Mailing {
     public function sendMailing($mailingId, $trackingKey, $projectKey = null) {
         $mailingTask = new MailingProcessorLongRunningTask($mailingId, $this->mailingService);
         return $this->longRunningTaskService->startTask("Mailing", $mailingTask, $trackingKey, $projectKey);
+    }
+
+
+    /**
+     * Send an adhoc mailing
+     *
+     * @http POST /sendAdhoc
+     *
+     * @param AdhocMailing $adhocMailing
+     */
+    public function sendAdhocMailing($adhocMailing) {
+        $this->mailingService->processAdhocMailing($adhocMailing);
     }
 
 

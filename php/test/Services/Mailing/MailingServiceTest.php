@@ -33,6 +33,7 @@ use Kinimailer\Services\Mailing\MailingService;
 use Kinimailer\Services\MailingList\MailingListService;
 use Kinimailer\Services\Template\TemplateService;
 use Kinimailer\TestBase;
+use Kinimailer\ValueObjects\Mailing\AdhocMailing;
 use PHPUnit\Framework\MockObject\MockObject;
 
 include_once "autoloader.php";
@@ -620,6 +621,68 @@ class MailingServiceTest extends TestBase {
             ]
 
         ]], $longRunningTask->getProgressData());
+
+    }
+
+
+    public function testCanSendAdhocMailingWithCustomTitleAndOriginalMailingLeftUnchanged() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+
+        $template = new TemplateSummary("Main Title", [new TemplateSection("top", "Top Section",
+            TemplateSection::TYPE_HTML)],
+            [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT)],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}');
+
+        $templateId = $this->templateService->saveTemplate($template, null, 0);
+        $template = $this->templateService->getTemplate($templateId);
+
+
+        $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+            [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
+                1, 2, 3
+            ], null, null, null, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+
+        $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
+
+
+        $adhocMailing = new AdhocMailing($mailingId, "Mark Test", "mark@test.com",
+            [new TemplateSection("top", "Top Section",
+                TemplateSection::TYPE_HTML, ["value" => "Running in the wild"])],
+            [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT, "Staggering in the dark")],
+            "My new subject access request", "from@test.com", "reply@test.com"
+        );
+
+
+        $template = new Template(new TemplateSummary("My new subject access request", [new TemplateSection("top", "Top Section",
+            TemplateSection::TYPE_HTML, ["value" => "Running in the wild"])],
+            [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT, "Staggering in the dark")],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}', [], $template->getId()), null, 0);
+
+        // Programme email responses
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 55),
+            [
+                new MailingEmail("from@test.com", "reply@test.com", ["Mark Test<mark@test.com>"], $template,
+                    new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test")), 0
+            ]);
+
+
+        $this->mailingService->processAdhocMailing($adhocMailing);
+
+
+        // Check mailing log entries stored correctly
+        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
+        $this->assertEquals(1, sizeof($mailingLogSets));
+        $logSet = $mailingLogSets[0];
+        $logEntries = $logSet->getLogEntries();
+        $this->assertEquals(1, sizeof($logEntries));
+
+        $this->assertEquals("Mark Test<mark@test.com>", $logEntries[0]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[0]->getStatus());
+        $this->assertNull($logEntries[0]->getFailureMessage());
+        $this->assertEquals(55, $logEntries[0]->getAssociatedItemId());
+
 
     }
 
