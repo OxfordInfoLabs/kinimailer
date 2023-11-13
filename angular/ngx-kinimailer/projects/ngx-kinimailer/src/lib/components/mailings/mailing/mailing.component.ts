@@ -6,6 +6,7 @@ import {NewMailingComponent} from './new-mailing/new-mailing.component';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TemplateService} from '../../../services/template.service';
 import * as _ from 'lodash';
+import {SendTestMailingComponent} from './send-test-mailing/send-test-mailing.component';
 
 @Component({
     selector: 'km-mailing',
@@ -67,6 +68,20 @@ export class MailingComponent implements OnInit {
         const dialogRef = this.dialog.open(NewMailingComponent, {
             width: '1200px',
             height: '800px',
+            data: {
+                mailing
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(res => {
+
+        });
+    }
+
+    public sendTest(mailing: any) {
+        const dialogRef = this.dialog.open(SendTestMailingComponent, {
+            width: '1000px',
+            height: '850px',
             data: {
                 mailing
             }
