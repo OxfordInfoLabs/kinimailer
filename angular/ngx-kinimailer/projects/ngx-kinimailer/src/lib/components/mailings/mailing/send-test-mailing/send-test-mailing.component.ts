@@ -38,7 +38,6 @@ export class SendTestMailingComponent implements OnInit {
             replyAddress = this.replyToName ? `${this.replyToName}<${this.replyToAddress}>` : this.replyToAddress;
         }
 
-console.log(this.mailing);
         await this.mailingService.sendMailingTest(this.name, this.emailAddress, this.mailing, fromAddress, replyAddress);
     }
 
