@@ -5,11 +5,10 @@ namespace Kinimailer\Objects\Mailing;
 
 
 use Kiniauth\Objects\Attachment\AttachmentSummary;
+use Kinikit\Core\Communication\Email\Attachment\EmailAttachment;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Security\Hash\SHA512HashProvider;
-use Kinikit\Core\Template\TemplateParser;
-use Kinimailer\Objects\Template\Template;
 use Kinimailer\Objects\Template\TemplateSummary;
 
 /**
@@ -32,7 +31,7 @@ class MailingEmail extends Email {
      * @param string $replyTo
      * @param string[] $recipients
      * @param TemplateSummary $template
-     * @param AttachmentSummary[] $attachments
+     * @param EmailAttachment[] $attachments
      */
     public function __construct($from, $replyTo, $recipients, $template, $subscriber = null, $attachments = []) {
 

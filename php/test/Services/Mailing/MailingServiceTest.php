@@ -14,6 +14,7 @@ use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kiniauth\Test\Services\Security\AuthenticationHelper;
+use Kinikit\Core\Communication\Email\Attachment\StringEmailAttachment;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Testing\MockObjectProvider;
@@ -209,20 +210,20 @@ class MailingServiceTest extends TestBase {
         $template->setParameters($mailing->getTemplateParameters());
         $template->setTitle("Test Mailing");
 
-        $attachmentSummaries = [AttachmentSummary::fetch($attachment->getId())];
+        $attachments = [new StringEmailAttachment("Hello World", "hello.txt", "text/text")];
 
         // Programme email responses
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template, null, $attachmentSummaries), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template, null, $attachments), 0
             ]);
 
 
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 51),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["james@hello.com"], $template, null, $attachmentSummaries), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["james@hello.com"], $template, null, $attachments), 0
             ]);
 
 
@@ -725,7 +726,7 @@ class MailingServiceTest extends TestBase {
             [
                 new MailingEmail("from@test.com", "reply@test.com", ["Mark Test <mark@test.com>"], $template,
                     new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test"),
-                    [AttachmentSummary::fetch($attachment->getId())]), 0
+                    [new StringEmailAttachment("Hello World", "hello.txt", "text/text")]), 0
             ]);
 
 

@@ -4,9 +4,11 @@ namespace Kinimailer\Services\Mailing;
 
 use Kiniauth\Objects\Account\Account;
 use Kiniauth\Objects\Attachment\AttachmentSummary;
+use Kiniauth\Objects\Attachment\Attachment;
 use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTask;
+use Kinikit\Core\Communication\Email\Attachment\StringEmailAttachment;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\Stream\File\ReadOnlyFileStream;
 use Kinikit\Core\Util\ObjectArrayUtils;
@@ -267,10 +269,18 @@ class MailingService {
         $logSet = new MailingLogSet($mailingId, [], $mailing->getProjectKey(), $mailing->getAccountId());
         $logSet->save();
 
+        $attachments = array_map(function ($attachment) {
+            /**
+             * @var Attachment $attachment
+             */
+            $attachment = Attachment::fetch($attachment->getId());
+            return new StringEmailAttachment($attachment->getContent(), $attachment->getAttachmentFilename(), $attachment->getMimeType());
+        }, $mailing->getAttachments() ?? []);
+
         // Add log entries as we go.
         $logEntries = [];
         foreach ($emailAddresses as $emailAddress) {
-            $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null, $mailing->getAttachments() ?? []);
+            $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null, $attachments);
             $response = $this->emailService->send($email, $mailing->getAccountId());
             $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
             $logEntry->save();
@@ -373,8 +383,16 @@ class MailingService {
         $sendAddress = $toSubscriber->getName() ?: "";
         $sendAddress = $sendAddress . ($toSubscriber->getName() ? " <" : "") . $toSubscriber->getEmailAddress() . ($toSubscriber->getName() ? ">" : "");
 
+        $attachments = array_map(function ($attachment) {
+            /**
+             * @var Attachment $attachment
+             */
+            $attachment = Attachment::fetch($attachment->getId());
+            return new StringEmailAttachment($attachment->getContent(), $attachment->getAttachmentFilename(), $attachment->getMimeType());
+        }, $mailing->getAttachments() ?? []);
+
         // Send the email
-        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $mailing->getAttachments());
+        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $attachments);
         $response = $this->emailService->send($email, $mailing->getAccountId());
 
         // Create a log entry
