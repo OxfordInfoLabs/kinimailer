@@ -52,6 +52,7 @@ trait MailingProfile {
      *
      * @param MailingProfileSummary $mailingProfileSummary
      * @param string $projectKey
+     * @unsanitise mailingProfileSummary
      *
      * @return int
      */

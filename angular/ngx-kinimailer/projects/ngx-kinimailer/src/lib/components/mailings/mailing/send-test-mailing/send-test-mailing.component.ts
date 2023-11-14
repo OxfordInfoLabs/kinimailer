@@ -32,13 +32,14 @@ export class SendTestMailingComponent implements OnInit {
         let fromAddress = null;
         let replyAddress = null;
         if (this.fromAddress) {
-            fromAddress = this.fromName ? `${this.fromName}<${this.fromAddress}>` : this.fromAddress;
+            fromAddress = this.fromName ? `${this.fromName} <${this.fromAddress}>` : this.fromAddress;
         }
         if (this.replyToAddress) {
-            replyAddress = this.replyToName ? `${this.replyToName}<${this.replyToAddress}>` : this.replyToAddress;
+            replyAddress = this.replyToName ? `${this.replyToName} <${this.replyToAddress}>` : this.replyToAddress;
         }
 
         await this.mailingService.sendMailingTest(this.name, this.emailAddress, this.mailing, fromAddress, replyAddress);
+        this.dialogRef.close();
     }
 
 }
