@@ -199,24 +199,30 @@ class MailingServiceTest extends TestBase {
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
+        $attachment = new Attachment(new AttachmentSummary("hello.txt", "text/text", "Mailing", $mailingId, null, null, 0));
+        $attachment->setContent("Hello World");
+        $attachment->save();
+
+
         $template = Template::fetch($templateId);
         $template->setSections($mailing->getTemplateSections());
         $template->setParameters($mailing->getTemplateParameters());
         $template->setTitle("Test Mailing");
 
+        $attachmentSummaries = [AttachmentSummary::fetch($attachment->getId())];
 
         // Programme email responses
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template, null), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["mark@hello.com"], $template, null, $attachmentSummaries), 0
             ]);
 
 
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 51),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["james@hello.com"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["james@hello.com"], $template, null, $attachmentSummaries), 0
             ]);
 
 
@@ -694,6 +700,11 @@ class MailingServiceTest extends TestBase {
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
 
+        $attachment = new Attachment(new AttachmentSummary("hello.txt", "text/text", "Mailing", $mailingId, null, null, 0));
+        $attachment->setContent("Hello World");
+        $attachment->save();
+
+
         $adhocMailing = new AdhocMailing($mailingId, "Mark Test", "mark@test.com",
             [new TemplateSection("top", "Top Section",
                 TemplateSection::TYPE_HTML, ["value" => "Running in the wild"])],
@@ -707,12 +718,14 @@ class MailingServiceTest extends TestBase {
             [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT, "Staggering in the dark")],
             '<h1>Welcome {{params.param1}}</h1>{{sections.top}}', [], $template->getId()), null, 0);
 
+
         // Programme email responses
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 55),
             [
                 new MailingEmail("from@test.com", "reply@test.com", ["Mark Test <mark@test.com>"], $template,
-                    new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test")), 0
+                    new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test"),
+                    [AttachmentSummary::fetch($attachment->getId())]), 0
             ]);
 
 

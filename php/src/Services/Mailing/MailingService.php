@@ -209,6 +209,7 @@ class MailingService {
          */
         $mailing = Mailing::fetch($mailingId);
 
+
         // Quit while we're ahead if sending
         if ($mailing->getStatus() == Mailing::STATUS_SENDING)
             return;
@@ -217,6 +218,8 @@ class MailingService {
         // Set sending status
         $mailing->setStatus(Mailing::STATUS_SENDING);
         $mailing->save();
+        $mailing = Mailing::fetch($mailing->getId());
+
 
         // Grab the template and update with mailing values
         $template = $mailing->getTemplate();
@@ -255,6 +258,7 @@ class MailingService {
         $fromAddress = $mailing->getMailingProfile()->getFromAddress();
         $replyToAddress = $mailing->getMailingProfile()->getReplyToAddress();
 
+
         /**
          * Loop through each email and send accordingly
          */
@@ -266,7 +270,7 @@ class MailingService {
         // Add log entries as we go.
         $logEntries = [];
         foreach ($emailAddresses as $emailAddress) {
-            $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null);
+            $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null, $mailing->getAttachments() ?? []);
             $response = $this->emailService->send($email, $mailing->getAccountId());
             $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
             $logEntry->save();
@@ -370,7 +374,7 @@ class MailingService {
         $sendAddress = $sendAddress . ($toSubscriber->getName() ? " <" : "") . $toSubscriber->getEmailAddress() . ($toSubscriber->getName() ? ">" : "");
 
         // Send the email
-        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber);
+        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $mailing->getAttachments());
         $response = $this->emailService->send($email, $mailing->getAccountId());
 
         // Create a log entry

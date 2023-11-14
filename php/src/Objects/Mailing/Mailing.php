@@ -60,7 +60,8 @@ class Mailing extends MailingSummary {
                 $mailingSummary->getUserIds(),
                 $mailingSummary->getEmailAddresses(),
                 $mailingSummary->getMailingProfile() ? new MailingProfile($mailingSummary->getMailingProfile(), $projectKey, $accountId) : null,
-                $mailingSummary->getScheduledTask() ? new ScheduledTask($mailingSummary->getScheduledTask(), $projectKey, $accountId) : null, [],
+                $mailingSummary->getScheduledTask() ? new ScheduledTask($mailingSummary->getScheduledTask(), $projectKey, $accountId) : null,
+                $mailingSummary->getAttachments() ?? [],
                 $mailingSummary->getId()
             );
         }
