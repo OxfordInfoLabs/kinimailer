@@ -2,6 +2,7 @@
 
 namespace Kinimailer\Objects\Mailing;
 
+use Kiniauth\Objects\Attachment\AttachmentSummary;
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTask;
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskSummary;
 use Kinikit\Persistence\ORM\ActiveRecord;
@@ -87,6 +88,15 @@ class MailingSummary extends ActiveRecord {
     protected $logSets;
 
 
+    /**
+     * @var AttachmentSummary[]
+     * @oneToMany
+     * @childJoinColumns parent_object_id,parent_object_type=Mailing
+     * @readOnly
+     */
+    protected $attachments;
+
+
     const STATUS_DRAFT = "draft";
     const STATUS_SENDING = "sending";
     const STATUS_SCHEDULED = "scheduled";
@@ -94,7 +104,6 @@ class MailingSummary extends ActiveRecord {
 
 
     /**
-     * @param int $id
      * @param string $title
      * @param TemplateSection[] $templateSections
      * @param TemplateParameter[] $templateParameters
@@ -105,8 +114,10 @@ class MailingSummary extends ActiveRecord {
      * @param mixed $emailAddresses
      * @param MailingProfileSummary $mailingProfile
      * @param ScheduledTaskSummary $scheduledTask
+     * @param AttachmentSummary[] $attachments
+     * @param int $id
      */
-    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $id = null) {
+    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $attachments = [], $id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->templateSections = $templateSections;
@@ -118,6 +129,7 @@ class MailingSummary extends ActiveRecord {
         $this->emailAddresses = $emailAddresses;
         $this->mailingProfile = $mailingProfile;
         $this->scheduledTask = $scheduledTask;
+        $this->attachments = $attachments;
     }
 
     /**
@@ -275,6 +287,21 @@ class MailingSummary extends ActiveRecord {
     public function setScheduledTask($scheduledTask) {
         $this->scheduledTask = $scheduledTask;
     }
+
+    /**
+     * @return AttachmentSummary[]
+     */
+    public function getAttachments() {
+        return $this->attachments;
+    }
+
+    /**
+     * @param AttachmentSummary[] $attachments
+     */
+    public function setAttachments($attachments) {
+        $this->attachments = $attachments;
+    }
+
 
     /**
      * @return MailingLogSetSummary[]

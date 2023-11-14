@@ -4,16 +4,20 @@
 namespace Kinimailer\Test\Services\Mailing;
 
 
+use Kiniauth\Objects\Attachment\Attachment;
+use Kiniauth\Objects\Attachment\AttachmentSummary;
 use Kiniauth\Objects\Communication\Email\StoredEmailSendResult;
 use Kiniauth\Objects\Communication\Email\StoredEmailSummary;
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskSummary;
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskTimePeriod;
+use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kiniauth\Test\Services\Security\AuthenticationHelper;
 use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Testing\MockObjectProvider;
+use Kinikit\MVC\Request\FileUpload;
 use Kinimailer\Controllers\Account\MailingList;
 use Kinimailer\Objects\Mailing\Mailing;
 use Kinimailer\Objects\Mailing\MailingEmail;
@@ -70,6 +74,11 @@ class MailingServiceTest extends TestBase {
      */
     private $longRunningTaskService;
 
+    /**
+     * @var AttachmentService
+     */
+    private $attachmentService;
+
 
     public function setUp(): void {
 
@@ -79,7 +88,8 @@ class MailingServiceTest extends TestBase {
 
         $this->emailService = MockObjectProvider::instance()->getMockInstance(EmailService::class);
         $this->mailingListService = MockObjectProvider::instance()->getMockInstance(MailingListService::class);
-        $this->mailingService = new MailingService($this->emailService, $this->templateService, $this->mailingListService);
+        $this->attachmentService = Container::instance()->get(AttachmentService::class);
+        $this->mailingService = new MailingService($this->emailService, $this->templateService, $this->mailingListService, $this->attachmentService);
 
     }
 
@@ -103,12 +113,18 @@ class MailingServiceTest extends TestBase {
             $scheduledTaskSummary);
         $mailingId = $this->mailingService->saveMailing($mailingSummary, null, 0);
 
+        $attachment = new Attachment(new AttachmentSummary("hello.txt", "text/text", "Mailing", $mailingId, null, null, 0));
+        $attachment->setContent("Hello World");
+        $attachment->save();
+
+
         // Update summary with expected saved values
         $mailingSummary->setId($mailingId);
         $mailingSummary->getScheduledTask()->setId(1);
         $mailingSummary->getScheduledTask()->setTaskIdentifier("mailing");
         $mailingSummary->getScheduledTask()->setDescription("Mailing");
         $mailingSummary->getScheduledTask()->setConfiguration($mailingId);
+        $mailingSummary->setAttachments([AttachmentSummary::fetch($attachment->getId())]);
 
 
         // Grab Mailing again
@@ -124,6 +140,38 @@ class MailingServiceTest extends TestBase {
         $reMailing = $this->mailingService->getMailing($mailingId);
         $this->assertEquals(Mailing::STATUS_DRAFT, $reMailing->getStatus());
 
+
+    }
+
+
+    public function testCanAttachUploadedFilesToContactAndRemoveThem() {
+
+        // Create new template
+        $templateSummary = new TemplateSummary("New one", [], [], "BINGO BANGO");
+        $templateId = $this->templateService->saveTemplate($templateSummary, null, 0);
+        $templateSummary->setId($templateId);
+
+
+        $mailingSummary = new MailingSummary("Test Mailing", [new TemplateSection("main", "Main", "text", "Hello world")], [new TemplateParameter("param1", "Param 1", "text", "Test")], $templateSummary,
+            MailingSummary::STATUS_DRAFT, [1, 3, 5], [1, 7, 9], ["bing@bong.com", "me@test.com"]);
+        $mailingId = $this->mailingService->saveMailing($mailingSummary, null, 0);
+
+
+        $fileUpload1 = new FileUpload("test", ["name" => "test.txt", "tmp_name" => __DIR__ . "/test.txt"]);
+        $fileUpload2 = new FileUpload("test", ["name" => "test2.txt", "tmp_name" => __DIR__ . "/test2.txt"]);
+
+        $this->mailingService->attachUploadedFilesToMailing($mailingId, [$fileUpload1, $fileUpload2]);
+
+        $attachments = Attachment::filter("WHERE parent_object_type = ? and parent_object_id = ?", "Mailing", $mailingId);
+        $this->assertEquals(2, sizeof($attachments));
+        $this->assertEquals(file_get_contents(__DIR__ . "/test.txt"), $attachments[0]->getContent());
+        $this->assertEquals(file_get_contents(__DIR__ . "/test2.txt"), $attachments[1]->getContent());
+
+        $this->mailingService->removeAttachmentFromMailing($mailingId, $attachments[0]->getId());
+
+        $attachments = Attachment::filter("WHERE parent_object_type = ? and parent_object_id = ?", "Mailing", $mailingId);
+        $this->assertEquals(1, sizeof($attachments));
+        $this->assertEquals(file_get_contents(__DIR__ . "/test2.txt"), $attachments[0]->getContent());
 
     }
 

@@ -6,6 +6,7 @@ use Kiniauth\Objects\Account\Account;
 use Kiniauth\Objects\Workflow\Task\LongRunning\StoredLongRunningTaskSummary;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kinikit\Core\Logging\Logger;
+use Kinikit\MVC\Request\FileUpload;
 use Kinimailer\Objects\Mailing\MailingSummary;
 use Kinimailer\Services\Mailing\MailingProcessorLongRunningTask;
 use Kinimailer\Services\Mailing\MailingService;
@@ -80,6 +81,32 @@ trait Mailing {
     public function saveMailing($mailingSummary, $projectKey = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
         return $this->mailingService->saveMailing($mailingSummary, $projectKey, $accountId);
     }
+
+
+    /**
+     * @http POST /attachments/$mailingId
+     *
+     * @param integer $mailingId
+     * @param FileUpload[] $fileUploads
+     *
+     * @return void
+     */
+    public function uploadMailingAttachments($mailingId, $fileUploads) {
+        $this->mailingService->attachUploadedFilesToMailing($mailingId, $fileUploads);
+    }
+
+    /**
+     * @http DELETE /attachments/$mailingId/$attachmentId
+     *
+     * @param integer $mailingId
+     * @param integer $attachmentId
+     *
+     * @return void
+     */
+    public function removeMailingAttachment($mailingId, $attachmentId) {
+        $this->mailingService->removeAttachmentFromMailing($mailingId, $attachmentId);
+    }
+
 
     /**
      * Delete a Mailing

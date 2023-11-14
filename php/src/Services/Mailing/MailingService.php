@@ -3,10 +3,14 @@
 namespace Kinimailer\Services\Mailing;
 
 use Kiniauth\Objects\Account\Account;
+use Kiniauth\Objects\Attachment\AttachmentSummary;
+use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTask;
 use Kinikit\Core\Communication\Email\Email;
+use Kinikit\Core\Stream\File\ReadOnlyFileStream;
 use Kinikit\Core\Util\ObjectArrayUtils;
+use Kinikit\MVC\Request\FileUpload;
 use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
 use Kinimailer\Objects\Mailing\Mailing;
 use Kinimailer\Objects\Mailing\MailingEmail;
@@ -40,17 +44,25 @@ class MailingService {
      */
     private $mailingListService;
 
+
+    /**
+     * @var AttachmentService
+     */
+    private $attachmentService;
+
     /**
      * MailingService constructor.
      *
      * @param EmailService $emailService
      * @param TemplateService $templateService
      * @param MailingListService $mailingListService
+     * @param AttachmentService $attachmentService
      */
-    public function __construct($emailService, $templateService, $mailingListService) {
+    public function __construct($emailService, $templateService, $mailingListService, $attachmentService) {
         $this->emailService = $emailService;
         $this->templateService = $templateService;
         $this->mailingListService = $mailingListService;
+        $this->attachmentService = $attachmentService;
     }
 
 
@@ -143,6 +155,44 @@ class MailingService {
         /** @var Mailing $mailing */
         $mailing = Mailing::fetch($id);
         $mailing->remove();
+    }
+
+
+    /**
+     * Upload attachments to a contact
+     *
+     * @param integer $contactId
+     * @param FileUpload[] $uploadedFiles
+     *
+     * @return void
+     */
+    public function attachUploadedFilesToMailing($mailingId, $uploadedFiles) {
+
+        // Check access to contact first
+        $mailing = Mailing::fetch($mailingId);
+
+        foreach ($uploadedFiles as $fileUpload) {
+            $attachmentSummary = new AttachmentSummary($fileUpload->getClientFilename(), $fileUpload->getMimeType(),
+                "Mailing", $mailing->getId(), null, $mailing->getProjectKey(), $mailing->getAccountId());
+            $this->attachmentService->saveAttachment($attachmentSummary, new ReadOnlyFileStream($fileUpload->getTemporaryFilePath()));
+        }
+    }
+
+
+    /**
+     * Remove an attachment from a contact
+     *
+     * @param integer $mailingId
+     * @param integer $attachmentId
+     * @return void
+     */
+    public function removeAttachmentFromMailing($mailingId, $attachmentId) {
+
+        // Check access to contact first
+        Mailing::fetch($mailingId);
+
+        // Remove attachment
+        $this->attachmentService->removeAttachment($attachmentId);
     }
 
 
