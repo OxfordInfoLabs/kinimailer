@@ -70,20 +70,20 @@
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col"
-                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                        class="py-2 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-6">
                                         Title
                                     </th>
-                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">
                                         Key
                                     </th>
-                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">
                                         Type
                                     </th>
                                     <th scope="col"
-                                        class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
+                                        class="whitespace-nowrap relative py-2 pl-3 pr-4 sm:pr-6 text-right w-1/5">
                                         <a href="javascript:void(0)" (click)="addSection()"
-                                           class="text-primary hover:underline inline-flex items-center text-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                           class="text-primary hover:underline flex items-center text-xs">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -96,19 +96,28 @@
                                 <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr *ngFor="let section of template.sections; let i = index"
                                     class="cursor-pointer hover:bg-gray-50">
-                                    <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                    <td class="py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                                         (click)="setSelectedSection(section)">
                                         {{section.title}}
                                     </td>
-                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                    <td class="px-3 py-3 text-sm text-gray-500"
                                         (click)="setSelectedSection(section)">
-                                        {{section.key ? '{{sections.' + section.key + '}' + '}' : ''}}
+                                        <div class="flex items-center">
+                                            <div #sectionText>
+                                                {{section.key ? '{{sections.' + section.key + '}' + '}' : ''}}
+                                            </div>
+                                            <button mat-icon-button [cdkCopyToClipboard]="sectionText.textContent"
+                                                    (cdkCopyToClipboardCopied)="copied()" class="h-5">
+                                                <mat-icon class="text-sm">content_copy</mat-icon>
+                                            </button>
+                                        </div>
+
                                     </td>
-                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                    <td class="px-3 py-3 text-sm text-gray-500"
                                         (click)="setSelectedSection(section)">
                                         {{section.type}}
                                     </td>
-                                    <td class="text-right relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <td class="text-right relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <a href="javascript:void(0)" (click)="removeSection(i)"
                                            class="inline-block text-red-600 hover:text-red-900">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -158,7 +167,8 @@
                                 <label class="block text-sm font-medium text-gray-700"> Default
                                     Value </label>
                                 <div class="mt-1">
-                                    <quill-editor [(ngModel)]="selectedSection.data.value"></quill-editor>
+                                    <quill-editor [(ngModel)]="selectedSection.data.value"
+                                                  (onBlur)="sanitiseHTML(null)"></quill-editor>
                                 </div>
                                 <p class="mt-2 text-sm text-gray-500">Enter the initial value to be used for this
                                     section.</p>
@@ -169,6 +179,7 @@
                                     <label class="block text-sm font-medium text-gray-700"> External URL </label>
                                     <div class="mt-1">
                                         <input type="text" [(ngModel)]="selectedSection.data.externalURL"
+                                               (change)="sanitiseHTML(null)"
                                                class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                     </div>
                                 </div>
@@ -176,6 +187,7 @@
                                     <label class="block text-sm font-medium text-gray-700"> XPath Selector </label>
                                     <div class="mt-1">
                                         <input type="text" [(ngModel)]="selectedSection.data.xPathSelector"
+                                               (change)="sanitiseHTML(null)"
                                                class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                     </div>
                                 </div>
@@ -195,20 +207,20 @@
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col"
-                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                        class="py-2 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-6">
                                         Title
                                     </th>
-                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">
                                         Key
                                     </th>
-                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">
                                         Type
                                     </th>
                                     <th scope="col"
-                                        class="whitespace-nowrap relative py-3.5 pl-3 pr-4 sm:pr-6 text-right w-1/5">
+                                        class="whitespace-nowrap relative py-2 pl-3 pr-4 sm:pr-6 text-right w-1/5">
                                         <a href="javascript:void(0)" (click)="addParameter()"
-                                           class="text-primary hover:underline inline-flex items-center text-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                           class="text-primary hover:underline flex items-center text-xs">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -221,19 +233,28 @@
                                 <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr *ngFor="let parameter of template.parameters; let i = index"
                                     class="cursor-pointer hover:bg-gray-50">
-                                    <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                    <td class="py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                                         (click)="setSelectedParameter(parameter)">
                                         {{parameter.title}}
                                     </td>
-                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                    <td class="px-3 py-3 text-sm text-gray-500"
                                         (click)="setSelectedParameter(parameter)">
-                                        {{parameter.key ? '{{params.' + parameter.key + '}' + '}' : ''}}
+                                        <div class="flex items-center">
+                                            <div #paramText>
+                                                {{parameter.key ? '{{params.' + parameter.key + '}' + '}' : ''}}
+                                            </div>
+                                            <button mat-icon-button [cdkCopyToClipboard]="paramText.textContent"
+                                                    (cdkCopyToClipboardCopied)="copied()"
+                                                    class="h-5">
+                                                <mat-icon class="text-sm">content_copy</mat-icon>
+                                            </button>
+                                        </div>
                                     </td>
-                                    <td class="px-3 py-4 text-sm text-gray-500"
+                                    <td class="px-3 py-3 text-sm text-gray-500"
                                         (click)="setSelectedParameter(parameter)">
                                         {{parameter.type}}
                                     </td>
-                                    <td class="text-right relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <td class="text-right relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <a href="javascript:void(0)" (click)="removeParameter(i)"
                                            class="inline-block text-red-600 hover:text-red-900">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"

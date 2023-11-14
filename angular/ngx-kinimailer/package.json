@@ -4,11 +4,11 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
-        "build:lib": "ng build ngx-kinimailer",
-        "build:lib-p": "ng build ngx-kinimailer --configuration production",
+        "build:lib": "cd projects/ngx-kinimailer && npm version patch && cd ../.. && ng build ngx-kinimailer",
+        "build:lib-p": "cd projects/ngx-kinimailer && npm version patch && cd ../.. && ng build ngx-kinimailer --configuration production",
         "watch:lib": "ng build ngx-kinimailer --watch --configuration development",
         "test": "ng test",
-        "publish": "cd projects/ngx-kinimailer && npm version patch && cd ../.. && npm run build:lib-p && cd dist/ngx-kinimailer && npm publish"
+        "publish": "npm run build:lib-p && cd dist/ngx-kinimailer && npm publish"
     },
     "private": true,
     "dependencies": {

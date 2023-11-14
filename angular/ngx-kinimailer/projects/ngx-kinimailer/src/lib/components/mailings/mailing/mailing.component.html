@@ -97,6 +97,7 @@
                                             {{templateParameter.title}} </label>
                                         <div class="mt-1">
                                             <input type="text" [(ngModel)]="templateParameter.value"
+                                                   (change)="sanitiseHTML()"
                                                    class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                         </div>
                                     </div>
@@ -106,6 +107,7 @@
                                             {{templateParameter.title}} </label>
                                         <div class="mt-1">
                                             <input type="date" [(ngModel)]="templateParameter.value"
+                                                   (change)="sanitiseHTML()"
                                                    class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                         </div>
                                     </div>
@@ -115,6 +117,7 @@
                                             {{templateParameter.title}} </label>
                                         <div class="mt-1">
                                             <input type="datetime-local" [(ngModel)]="templateParameter.value"
+                                                   (change)="sanitiseHTML()"
                                                    class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                         </div>
                                     </div>

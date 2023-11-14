@@ -25,6 +25,7 @@ import { MailingProfilesComponent } from './components/mailing-profiles/mailing-
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MailingStatusComponent } from './components/mailings/mailing/mailing-status/mailing-status.component';
 import { SendTestMailingComponent } from './components/mailings/mailing/send-test-mailing/send-test-mailing.component';
+import {ClipboardModule} from '@angular/cdk/clipboard';
 
 
 @NgModule({
@@ -56,7 +57,8 @@ import { SendTestMailingComponent } from './components/mailings/mailing/send-tes
         MatIconModule,
         MatButtonModule,
         MatSnackBarModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        ClipboardModule
     ],
     exports: [
         MailingListsComponent,

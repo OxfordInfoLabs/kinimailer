@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {TemplateService} from '../../../services/template.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import * as _ from 'lodash';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
     selector: 'km-template',
@@ -30,7 +31,8 @@ export class TemplateComponent implements OnInit {
 
     constructor(private route: ActivatedRoute,
                 private templateService: TemplateService,
-                private sanitise: DomSanitizer) {
+                private sanitise: DomSanitizer,
+                private snackBar: MatSnackBar) {
     }
 
     ngOnInit(): void {
@@ -58,6 +60,13 @@ export class TemplateComponent implements OnInit {
         const html: string = await this.templateService.evaluateTemplate(this.template);
         // this.iframeLoading = true;
         this.templateHTML = this.sanitise.bypassSecurityTrustHtml(html);
+    }
+
+    public copied() {
+        this.snackBar.open('Copied to Clipboard', null, {
+            duration: 2000,
+            verticalPosition: 'bottom'
+        });
     }
 
     public addSection() {
