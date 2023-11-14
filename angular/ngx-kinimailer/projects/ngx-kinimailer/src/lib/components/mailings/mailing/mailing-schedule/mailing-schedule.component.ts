@@ -62,8 +62,11 @@ export class MailingScheduleComponent implements OnInit {
     public async sendNow() {
         await this.save();
         const trackingKey = 'mailing' + Date.now();
-        await this.mailingService.sendMailing(this.mailing.id, trackingKey, '', this.sendImmediately);
-        this.router.navigate(['/mailings', this.mailing.id, 'status', trackingKey]);
+        this.mailingService.sendMailing(this.mailing.id, trackingKey, '', this.sendImmediately);
+
+        setTimeout(() => {
+            this.router.navigate(['/mailings', this.mailing.id, 'status', trackingKey]);
+        }, 2000);
     }
 
     public async save() {

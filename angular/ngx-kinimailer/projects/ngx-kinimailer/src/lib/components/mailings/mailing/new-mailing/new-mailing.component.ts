@@ -86,6 +86,10 @@ export class NewMailingComponent implements OnInit {
         });
     }
 
+    public close() {
+        this.dialogRef.close();
+    }
+
     public updateKey(value) {
         this.mailing.key = _.camelCase(value);
     }
@@ -115,6 +119,28 @@ export class NewMailingComponent implements OnInit {
         window.location.href = '/mailings/' + mailingId;
     }
 
+    public async attachmentsUpload(event: any) {
+        const files: any[] = Array.from(event.target.files);
+
+        const formData = new FormData();
+
+        for (const file of files) {
+            formData.append(file.name, file);
+        }
+
+        await this.mailingService.uploadAttachments(this.mailing.id, formData);
+        this.loadMailing();
+    }
+
+    public async removeAttachment(attachmentId: number) {
+        await this.mailingService.removeAttachment(this.mailing.id, attachmentId);
+        this.loadMailing();
+    }
+
+    public streamAttachment(id: number) {
+        this.mailingService.streamAttachment(id);
+    }
+
     private getMailingLists() {
         return this.mailingListService.filterMailingList(
             this.mailingListSearchText.getValue() || '',
@@ -135,6 +161,10 @@ export class NewMailingComponent implements OnInit {
                 return templates;
             })
         );
+    }
+
+    private async loadMailing() {
+        this.mailing = await this.mailingService.getMailing(this.mailing.id);
     }
 
 }

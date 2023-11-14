@@ -134,23 +134,85 @@
                     </tbody>
                 </table>
             </mat-tab>
+            <mat-tab *ngIf="mailing.id" label="Attachments">
+
+                <div class="p-6 space-y-6 sm:pt-10 sm:space-y-5">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Mailing Attachments</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">Upload attachments to be send with this Mailing.</p>
+                    </div>
+                    <div class="space-y-6 sm:space-y-5">
+
+                        <div *ngIf="mailing.attachments?.length" class="col-span-full">
+                            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt class="text-sm font-medium leading-6 text-gray-900">Attachments</dt>
+                                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                                        <li *ngFor="let attachment of mailing.attachments" class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+                                            <div class="flex w-0 flex-1 items-center">
+                                                <svg class="h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z" clip-rule="evenodd" />
+                                                </svg>
+                                                <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                                    <span (click)="streamAttachment(attachment.id)"
+                                                          class="truncate font-medium text-primary hover:underline cursor-pointer">
+                                                        {{attachment.attachmentFilename}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4 flex align-center flex-shrink-0">
+                                                <button type="button" (click)="removeAttachment(attachment.id)"
+                                                        class="rounded-full border border-orange-400 bg-orange-100 p-1 text-orange-400 shadow-sm hover:bg-orange-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </dd>
+                            </div>
+                        </div>
+
+                        <div class="col-span-full">
+                            <button type="button" (click)="attachments.click()"
+                                    class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-8 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                     stroke="currentColor" class="mx-auto h-12 w-12 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m0-3l-3-3m0 0l-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75" />
+                                </svg>
+
+                                <span class="mt-2 block text-sm font-semibold text-gray-900">Click to Upload Attachment</span>
+                            </button>
+
+                            <input name="attachments" multiple type="file" class="sr-only"
+                                   (change)="attachmentsUpload($event)" #attachments>
+                        </div>
+
+                    </div>
+                </div>
+
+            </mat-tab>
         </mat-tab-group>
     </div>
 
     <div class="w-full p-4 bg-gray-100 flex items-center justify-between">
-        <div *ngIf="tabGroup.selectedIndex === 0"></div>
+        <button type="button" *ngIf="tabGroup.selectedIndex === 0" (click)="close()"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Back</button>
         <button type="button" *ngIf="tabGroup.selectedIndex !== 0" (click)="tabGroup.selectedIndex = tabGroup.selectedIndex - 1"
                 class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
             Back</button>
 
-        <ng-template [ngIf]="tabGroup.selectedIndex === 2">
+        <ng-template [ngIf]="tabGroup.selectedIndex === (mailing.id ? 3 : 2)">
             <button type="button" (click)="createMailing()"
                     class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
                 <ng-template [ngIf]="!mailing.id">Create Mailing</ng-template>
                 <ng-template [ngIf]="mailing.id">Save Mailing</ng-template>
             </button>
         </ng-template>
-        <ng-template [ngIf]="tabGroup.selectedIndex < 2">
+        <ng-template [ngIf]="tabGroup.selectedIndex < (mailing.id ? 3 : 2)">
             <button type="button" (click)="tabGroup.selectedIndex = tabGroup.selectedIndex + 1"
                     class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary">
                 Next

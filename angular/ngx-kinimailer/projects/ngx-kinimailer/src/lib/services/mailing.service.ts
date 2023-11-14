@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {KinimailerModuleConfig} from '../ngx-kinimailer.module';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {map, switchMap} from 'rxjs/operators';
 import {interval} from 'rxjs';
@@ -67,5 +67,23 @@ export class MailingService {
         return this.http.post(this.config.backendURL + '/mailing/sendAdhoc', {
             mailingId: mailing.id, name, emailAddress, sections: mailing.templateSections, parameters: mailing.templateParameters, title: mailing.title, fromAddress, replyToAddress
         }).toPromise();
+    }
+
+    public uploadAttachments(mailingId: number, fileUploads: any) {
+        const HttpUploadOptions = {
+            headers: new HttpHeaders({'Content-Type': 'file'})
+        };
+        return this.http.post(this.config.backendURL + '/mailing/attachments/' + mailingId,
+            fileUploads, HttpUploadOptions)
+            .toPromise();
+    }
+
+    public removeAttachment(mailingId: number, attachmentId: number) {
+        return this.http.delete(this.config.backendURL + `/mailing/attachments/${mailingId}/${attachmentId}`)
+            .toPromise();
+    }
+
+    public streamAttachment(id: number) {
+        window.open(this.config.backendURL + '/attachment/' + id);
     }
 }

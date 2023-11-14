@@ -26,6 +26,22 @@ export class SendTestMailingComponent implements OnInit {
 
     ngOnInit(): void {
         this.mailing = this.data.mailing;
+
+        const fromAddress = this.mailing.mailingProfile ? this.mailing.mailingProfile.fromAddress : '';
+        if (fromAddress.includes('<')) {
+            this.fromName = fromAddress.split('<')[0].trim();
+            this.fromAddress = fromAddress.split('<')[1].replace('>', '').trim();
+        } else {
+            this.fromAddress = fromAddress;
+        }
+
+        const replyAddress = this.mailing.mailingProfile ? this.mailing.mailingProfile.replyToAddress : '';
+        if (replyAddress.includes('<')) {
+            this.replyToName = replyAddress.split('<')[0].trim();
+            this.replyToAddress = replyAddress.split('<')[1].replace('>', '').trim();
+        } else {
+            this.replyToAddress = replyAddress;
+        }
     }
 
     public async sendTest() {
@@ -39,6 +55,10 @@ export class SendTestMailingComponent implements OnInit {
         }
 
         await this.mailingService.sendMailingTest(this.name, this.emailAddress, this.mailing, fromAddress, replyAddress);
+        this.dialogRef.close();
+    }
+
+    public close() {
         this.dialogRef.close();
     }
 
