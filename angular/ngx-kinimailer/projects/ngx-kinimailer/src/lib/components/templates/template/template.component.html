@@ -305,6 +305,7 @@
                                 <label class="block text-sm font-medium text-gray-700">Value</label>
                                 <div class="mt-1">
                                     <input type="text" [(ngModel)]="selectedParameter.value"
+                                           (change)="sanitiseHTML(null)"
                                            class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
