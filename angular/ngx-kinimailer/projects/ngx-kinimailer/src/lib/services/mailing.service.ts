@@ -63,9 +63,9 @@ export class MailingService {
             );
     }
 
-    public sendMailingTest(name, emailAddress, mailing, fromAddress, replyToAddress) {
+    public sendMailingTest(name, emailAddress, mailing, fromAddress, replyToAddress, ccAddresses = '', bccAddresses = '') {
         return this.http.post(this.config.backendURL + '/mailing/sendAdhoc', {
-            mailingId: mailing.id, name, emailAddress, sections: mailing.templateSections, parameters: mailing.templateParameters, title: mailing.title, fromAddress, replyToAddress
+            mailingId: mailing.id, name, emailAddress, sections: mailing.templateSections, parameters: mailing.templateParameters, title: mailing.title, fromAddress, replyToAddress, ccAddresses, bccAddresses
         }).toPromise();
     }
 

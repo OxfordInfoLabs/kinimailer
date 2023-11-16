@@ -17,6 +17,8 @@ export class SendTestMailingComponent implements OnInit {
     public fromName: string;
     public replyToAddress: string;
     public replyToName: string;
+    public ccAddresses = '';
+    public bccAddresses = '';
 
 
     constructor(public dialogRef: MatDialogRef<SendTestMailingComponent>,
@@ -54,7 +56,7 @@ export class SendTestMailingComponent implements OnInit {
             replyAddress = this.replyToName ? `${this.replyToName} <${this.replyToAddress}>` : this.replyToAddress;
         }
 
-        await this.mailingService.sendMailingTest(this.name, this.emailAddress, this.mailing, fromAddress, replyAddress);
+        await this.mailingService.sendMailingTest(this.name, this.emailAddress, this.mailing, fromAddress, replyAddress, this.ccAddresses, this.bccAddresses);
         this.dialogRef.close();
     }
 

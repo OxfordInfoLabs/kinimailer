@@ -4,63 +4,88 @@
             <div class="text-lg">Send Test Mailing</div>
         </div>
     </div>
-    <div class="flex-1">
-        <div class="p-6 space-y-6 sm:pt-10 sm:space-y-5">
-            <div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Sending Details</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">Information about who to send the mailing to and where
+    <div class="flex-1 p-8">
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="mb-0 text-base font-semibold leading-7 text-gray-900">Sending Details</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">Information about who to send the mailing to and where
                     to send it from.</p>
-            </div>
-            <div class="space-y-6 sm:space-y-5">
-                <div
-                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Name </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="name"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Name</label>
+                        <div class="mt-2">
+                            <input type="text" [(ngModel)]="name"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
                     </div>
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Email Address </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="email" [(ngModel)]="emailAddress"
-                               [ngClass]="{'border-red-600': !emailAddress}"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
-                <div
-                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Title </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="mailing.title"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
-                <div
-                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> From Name </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="fromName"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> From Email Address </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="fromAddress"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
-                <div
-                    class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Reply To Name </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="replyToName"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                    <label class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"> Reply To Address </label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input type="text" [(ngModel)]="replyToAddress"
-                               class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
 
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Email Address</label>
+                        <div class="mt-2">
+                            <input type="email" [(ngModel)]="emailAddress"
+                                   [ngClass]="{'ring-red-600': !emailAddress}"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-full">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Email Subject</label>
+                        <div class="mt-2">
+                            <input type="text" [(ngModel)]="mailing.title"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">From Name</label>
+                        <div class="mt-2">
+                            <input type="text" [(ngModel)]="fromName"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">From Email Address</label>
+                        <div class="mt-2">
+                            <input type="email" [(ngModel)]="fromAddress"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Reply To Name</label>
+                        <div class="mt-2">
+                            <input type="text" [(ngModel)]="replyToName"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Reply To Email Address</label>
+                        <div class="mt-2">
+                            <input type="email" [(ngModel)]="replyToAddress"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Cc Email Addresses</label>
+                        <div class="mt-2">
+                            <input type="text" [(ngModel)]="ccAddresses"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <div class="text-xs text-gray-400">Comma separate email addresses</div>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Bcc Email Addresses</label>
+                        <div class="mt-2">
+                            <input type="email" [(ngModel)]="bccAddresses"
+                                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <div class="text-xs text-gray-400">Comma separate email addresses</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
