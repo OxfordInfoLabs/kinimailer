@@ -710,7 +710,8 @@ class MailingServiceTest extends TestBase {
             [new TemplateSection("top", "Top Section",
                 TemplateSection::TYPE_HTML, ["value" => "Running in the wild"])],
             [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT, "Staggering in the dark")],
-            "My new subject access request", "from@test.com", "reply@test.com"
+            "My new subject access request", "from@test.com", "reply@test.com", "bobby@test.com, james@maths.com",
+            "mark@hidden.org, james@hidden.com"
         );
 
 
@@ -726,7 +727,8 @@ class MailingServiceTest extends TestBase {
             [
                 new MailingEmail("from@test.com", "reply@test.com", ["Mark Test <mark@test.com>"], $template,
                     new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test"),
-                    [new StringEmailAttachment("Hello World", "hello.txt", "text/text")]), 0
+                    [new StringEmailAttachment("Hello World", "hello.txt", "text/text")],
+                    ["bobby@test.com", "james@maths.com"], ["mark@hidden.org", "james@hidden.com"]), 0
             ]);
 
 

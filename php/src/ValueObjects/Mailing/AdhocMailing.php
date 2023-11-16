@@ -52,6 +52,18 @@ class AdhocMailing {
     private $replyToAddress;
 
     /**
+     * @var string
+     */
+    private $ccAddresses;
+
+
+    /**
+     * @var string
+     */
+    private $bccAddresses;
+
+
+    /**
      * @param int $mailingId
      * @param string $name
      * @param string $emailAddress
@@ -60,8 +72,10 @@ class AdhocMailing {
      * @param string $title
      * @param string $fromAddress
      * @param string $replyToAddress
+     * @param string $ccAddresses
+     * @param string $bccAddresses
      */
-    public function __construct($mailingId, $name, $emailAddress, array $sections, array $parameters, $title, $fromAddress, $replyToAddress) {
+    public function __construct($mailingId, $name, $emailAddress, array $sections, array $parameters, $title, $fromAddress, $replyToAddress, $ccAddresses, $bccAddresses) {
         $this->mailingId = $mailingId;
         $this->name = $name;
         $this->emailAddress = $emailAddress;
@@ -70,6 +84,8 @@ class AdhocMailing {
         $this->title = $title;
         $this->fromAddress = $fromAddress;
         $this->replyToAddress = $replyToAddress;
+        $this->ccAddresses = $ccAddresses;
+        $this->bccAddresses = $bccAddresses;
     }
 
 
@@ -183,6 +199,34 @@ class AdhocMailing {
      */
     public function setTitle($title) {
         $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCcAddresses() {
+        return $this->ccAddresses;
+    }
+
+    /**
+     * @param string $ccAddresses
+     */
+    public function setCcAddresses($ccAddresses) {
+        $this->ccAddresses = $ccAddresses;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBccAddresses() {
+        return $this->bccAddresses;
+    }
+
+    /**
+     * @param string $bccAddresses
+     */
+    public function setBccAddresses($bccAddresses) {
+        $this->bccAddresses = $bccAddresses;
     }
 
 

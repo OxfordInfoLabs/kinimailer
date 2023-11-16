@@ -318,8 +318,26 @@ class MailingService {
          */
         $subscriber = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
 
+        $ccAddresses = [];
+        if ($adhocMailing->getCcAddresses()) {
+            foreach (explode(",", $adhocMailing->getCcAddresses()) as $item) {
+                $ccAddresses[] = trim($item);
+            }
+        }
+
+        $bccAddresses = [];
+        if ($adhocMailing->getBccAddresses()) {
+            foreach (explode(",", $adhocMailing->getBccAddresses()) as $item) {
+                $bccAddresses[] = trim($item);
+            }
+        }
+
+
+
         // Send the single mailing
-        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(), $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress());
+        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(), $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
+            $ccAddresses,
+            $bccAddresses);
 
     }
 
@@ -351,7 +369,7 @@ class MailingService {
             $subscriber = $subscribers[0];
 
             $this->sendSingleMailing($mailing, $subscriber, $mailing->getTitle(), $mailing->getTemplateSections(), $mailing->getTemplateParameters(), $mailing->getMailingProfile()->getFromAddress(),
-                $mailing->getMailingProfile()->getReplyToAddress());
+                $mailing->getMailingProfile()->getReplyToAddress(), [], []);
         }
 
 
@@ -366,9 +384,11 @@ class MailingService {
      * @param TemplateParameter[] $templateParameters
      * @param string $fromAddress
      * @param string $replyToAddress
+     * @param array $ccAddresses
+     * @param array $bccAddresses
      * @return void
      */
-    private function sendSingleMailing($mailing, $toSubscriber, $title, $templateSections, $templateParameters, $fromAddress, $replyToAddress) {
+    private function sendSingleMailing($mailing, $toSubscriber, $title, $templateSections, $templateParameters, $fromAddress, $replyToAddress, $ccAddresses = [], $bccAddresses = []) {
 
         // Create the log set
         $logSet = new MailingLogSet($mailing->getId(), [], $mailing->getProjectKey(), $mailing->getAccountId());
@@ -392,7 +412,7 @@ class MailingService {
         }, $mailing->getAttachments() ?? []);
 
         // Send the email
-        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $attachments);
+        $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $attachments, $ccAddresses, $bccAddresses);
         $response = $this->emailService->send($email, $mailing->getAccountId());
 
         // Create a log entry
