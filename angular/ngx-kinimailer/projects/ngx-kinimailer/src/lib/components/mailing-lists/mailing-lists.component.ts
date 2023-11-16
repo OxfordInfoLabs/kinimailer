@@ -12,7 +12,7 @@ export class MailingListsComponent implements OnInit {
 
     public mailingLists: any = [];
     public searchText = new BehaviorSubject('');
-    public limit = 10;
+    public limit = 1000;
     public offset = 0;
     public page = 1;
     public endOfResults = false;
