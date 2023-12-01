@@ -369,7 +369,7 @@ class MailingServiceTest extends TestBase {
         $template = new TemplateSummary("Main Title", [new TemplateSection("top", "Top Section",
             TemplateSection::TYPE_HTML)],
             [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT)],
-            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}');
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}} - This is sent to {{subscriber.name}} at {{subscriber.emailAddress}}');
 
         $templateId = $this->templateService->saveTemplate($template, null, 0);
         $template = $this->templateService->getTemplate($templateId);
@@ -409,27 +409,27 @@ class MailingServiceTest extends TestBase {
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 50),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["Mark Jones<mark@test.com>"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["Mark Jones<mark@test.com>"], $template, new MailingListSubscriber(1, null, "mark@test.com", null, "Mark Jones")), 0
             ]);
 
 
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 51),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["james@test.com"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["james@test.com"], $template, new MailingListSubscriber(1, null, "james@test.com")), 0
             ]);
 
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 52),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["Peter Smith<peter@test.com>"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["Peter Smith<peter@test.com>"], $template, new MailingListSubscriber(2, null, "peter@test.com", null, "Peter Smith")), 0
             ]);
 
 
         $this->emailService->returnValue("send",
             new StoredEmailSendResult(StoredEmailSendResult::STATUS_FAILED, "BAD EMAIL SEND", 53),
             [
-                new MailingEmail("from@hello.com", "reply@hello.com", ["paul@test.com"], $template), 0
+                new MailingEmail("from@hello.com", "reply@hello.com", ["paul@test.com"], $template, new MailingListSubscriber(2, null, "paul@test.com")), 0
             ]);
 
         // Process mailing

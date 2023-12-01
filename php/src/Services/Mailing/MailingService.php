@@ -243,16 +243,12 @@ class MailingService {
             foreach ($mailing->getMailingListIds() as $mailingListId) {
                 $subscribers = $this->mailingListService->getSubscribersForMailingList($mailingListId);
                 $subscriberEmails = array_map(function ($subscriber) {
-                    if ($subscriber->getName()) {
-                        return $subscriber->getName() . "<" . $subscriber->getEmailAddress() . ">";
-                    } else {
-                        return $subscriber->getEmailAddress();
-                    }
+                    return $subscriber->getFullEmailAddress();
                 }, $subscribers);
                 $emailAddresses = array_merge($emailAddresses, $subscriberEmails);
 
                 // Grab subscribers by email
-                $subscribersByEmail = array_merge($subscribersByEmail, ObjectArrayUtils::indexArrayOfObjectsByMember("emailAddress", $subscribers));
+                $subscribersByEmail = array_merge($subscribersByEmail, ObjectArrayUtils::indexArrayOfObjectsByMember("fullEmailAddress", $subscribers));
             }
         }
 
@@ -280,8 +276,11 @@ class MailingService {
         // Add log entries as we go.
         $logEntries = [];
         foreach ($emailAddresses as $emailAddress) {
+
             $email = new MailingEmail($fromAddress, $replyToAddress, [$emailAddress], $template, $subscribersByEmail[$emailAddress] ?? null, $attachments);
+
             $response = $this->emailService->send($email, $mailing->getAccountId());
+
             $logEntry = new MailingLogEntry($emailAddress, $response->getStatus(), $response->getErrorMessage(), $response->getEmailId(), $logSet->getId());
             $logEntry->save();
 
@@ -331,7 +330,6 @@ class MailingService {
                 $bccAddresses[] = trim($item);
             }
         }
-
 
 
         // Send the single mailing

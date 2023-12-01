@@ -143,6 +143,21 @@ class MailingListSubscriber extends ActiveRecord {
         $this->emailAddress = $emailAddress;
     }
 
+
+    /**
+     * Get full email address with name prefix
+     *
+     * @return string|null
+     */
+    public function getFullEmailAddress() {
+        if ($this->getName()) {
+            return $this->getName() . "<" . $this->getEmailAddress() . ">";
+        } else {
+            return $this->getEmailAddress();
+        }
+    }
+
+
     /**
      * @return string
      */
