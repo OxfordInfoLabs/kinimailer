@@ -680,7 +680,7 @@ class MailingServiceTest extends TestBase {
     }
 
 
-    public function testCanSendAdhocMailingWithCustomTitleAndOriginalMailingLeftUnchanged() {
+    public function testCanSendAdhocMailingWithOverridenData() {
 
         AuthenticationHelper::login("admin@kinicart.com", "password");
 
@@ -733,6 +733,79 @@ class MailingServiceTest extends TestBase {
 
 
         $this->mailingService->processAdhocMailing($adhocMailing);
+
+
+        // Check mailing log entries stored correctly
+        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
+        $this->assertEquals(1, sizeof($mailingLogSets));
+        $logSet = $mailingLogSets[0];
+        $logEntries = $logSet->getLogEntries();
+        $this->assertEquals(1, sizeof($logEntries));
+
+        $this->assertEquals("Mark Test <mark@test.com>", $logEntries[0]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[0]->getStatus());
+        $this->assertNull($logEntries[0]->getFailureMessage());
+        $this->assertEquals(55, $logEntries[0]->getAssociatedItemId());
+
+
+    }
+
+
+    public function testCanSendAdhocMailingUsingTemplateAndProfiledFromData() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+
+        $template = new TemplateSummary("Main Title", [new TemplateSection("top", "Top Section",
+            TemplateSection::TYPE_HTML)],
+            [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT)],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}');
+
+        $templateId = $this->templateService->saveTemplate($template, null, 0);
+        $template = $this->templateService->getTemplate($templateId);
+
+
+        $mailingProfile = new MailingProfile(new MailingProfileSummary("Example", "from@myorg.com", "replyto@myorg.com"), null, 0);
+        $mailingProfile->save();
+
+
+        $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+            [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
+                1, 2, 3
+            ], null, null, $mailingProfile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+
+        $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
+
+
+        $attachment = new Attachment(new AttachmentSummary("hello.txt", "text/text", "Mailing", $mailingId, null, null, 0));
+        $attachment->setContent("Hello World");
+        $attachment->save();
+
+
+        $adhocMailing = new AdhocMailing($mailingId, "Mark Test", "mark@test.com");
+
+
+        $updatedTemplate = new Template(new TemplateSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title",
+            TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+            [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}',[], 1), null, 0);
+
+
+
+        // Programme email responses
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 55),
+            [
+                new MailingEmail("from@myorg.com", "replyto@myorg.com", ["Mark Test <mark@test.com>"], $updatedTemplate,
+                    new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test"),
+                    [new StringEmailAttachment("Hello World", "hello.txt", "text/text")],
+                    [], []), 0
+            ]);
+
+
+
+
+        $this->mailingService->processAdhocMailing($adhocMailing);
+
 
 
         // Check mailing log entries stored correctly

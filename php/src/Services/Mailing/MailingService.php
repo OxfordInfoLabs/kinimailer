@@ -333,7 +333,8 @@ class MailingService {
 
 
         // Send the single mailing
-        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(), $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
+        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(),
+            $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
             $ccAddresses,
             $bccAddresses);
 
@@ -366,8 +367,7 @@ class MailingService {
 
             $subscriber = $subscribers[0];
 
-            $this->sendSingleMailing($mailing, $subscriber, $mailing->getTitle(), $mailing->getTemplateSections(), $mailing->getTemplateParameters(), $mailing->getMailingProfile()->getFromAddress(),
-                $mailing->getMailingProfile()->getReplyToAddress(), [], []);
+            $this->sendSingleMailing($mailing, $subscriber);
         }
 
 
@@ -377,25 +377,29 @@ class MailingService {
     /**
      * @param Mailing $mailing
      * @param MailingListSubscriber $toSubscriber
-     * @param $title
-     * @param TemplateSection[] $templateSections
-     * @param TemplateParameter[] $templateParameters
-     * @param string $fromAddress
-     * @param string $replyToAddress
+     * @param $customTitle
+     * @param TemplateSection[] $customTemplateSections
+     * @param TemplateParameter[] $customTemplateParameters
+     * @param string $customFromAddress
+     * @param string $customReplyToAddress
      * @param array $ccAddresses
      * @param array $bccAddresses
      * @return void
      */
-    private function sendSingleMailing($mailing, $toSubscriber, $title, $templateSections, $templateParameters, $fromAddress, $replyToAddress, $ccAddresses = [], $bccAddresses = []) {
+    private function sendSingleMailing($mailing, $toSubscriber, $customTitle = null, $customTemplateSections = [], $customTemplateParameters = [],
+                                       $customFromAddress = null, $customReplyToAddress = null, $ccAddresses = [], $bccAddresses = []) {
 
         // Create the log set
         $logSet = new MailingLogSet($mailing->getId(), [], $mailing->getProjectKey(), $mailing->getAccountId());
         $logSet->save();
 
+        // Grab template and update details
         $template = $mailing->getTemplate();
-        $template->setTitle($title);
-        $template->setSections($templateSections);
-        $template->setParameters($templateParameters);
+        $template->setTitle($customTitle ?? $mailing->getTitle());
+
+        // Add mailing sections and any custom ones passed in.
+        $template->mergeData($mailing->getTemplateSections() ?? [], $mailing->getTemplateParameters() ?? []);
+        $template->mergeData($customTemplateSections ?? [], $customTemplateParameters ?? []);
 
 
         $sendAddress = $toSubscriber->getName() ?: "";
@@ -408,6 +412,12 @@ class MailingService {
             $attachment = Attachment::fetch($attachment->getId());
             return new StringEmailAttachment($attachment->getContent(), $attachment->getAttachmentFilename(), $attachment->getMimeType());
         }, $mailing->getAttachments() ?? []);
+
+
+        // Derive from and to addresses
+        $fromAddress = $customFromAddress ?? ($mailing->getMailingProfile() ? $mailing->getMailingProfile()->getFromAddress() : null) ?? null;
+        $replyToAddress = $customReplyToAddress ?? ($mailing->getMailingProfile() ? $mailing->getMailingProfile()->getReplyToAddress() : null) ?? null;
+
 
         // Send the email
         $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $attachments, $ccAddresses, $bccAddresses);

@@ -6,6 +6,7 @@ use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Logging\Logger;
 use Kinikit\Core\Template\MustacheTemplateParser;
 use Kinikit\Core\Template\TemplateParser;
+use Kinikit\Core\Util\ObjectArrayUtils;
 use Kinikit\Persistence\ORM\ActiveRecord;
 use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\ValueObjects\MailingList\MailingListSubscriberSummary;
@@ -62,8 +63,8 @@ class TemplateSummary extends ActiveRecord {
      */
     public function __construct($title = null, $sections = null, $parameters = null, $html = null, $contentHashSections = [], $id = null) {
         $this->title = $title;
-        $this->sections = $sections;
-        $this->parameters = $parameters;
+        $this->sections = $sections ?? [];
+        $this->parameters = $parameters ?? [];
         $this->html = $html;
         $this->contentHashSections = $contentHashSections;
         $this->id = $id;
@@ -152,6 +153,44 @@ class TemplateSummary extends ActiveRecord {
     public function setContentHashSections($contentHashSections) {
         $this->contentHashSections = $contentHashSections;
     }
+
+
+    /**
+     * Merge data using arrays of sections and params
+     *
+     * @param $newTemplateSections
+     * @param $newTemplateParameters
+     * @return void
+     */
+    public function mergeData($newTemplateSections = [], $newTemplateParameters = []) {
+
+        // Merge section data
+        $indexedExistingSections = ObjectArrayUtils::indexArrayOfObjectsByMember("key", $this->getSections() ?? []);
+        foreach ($newTemplateSections as $templateSection) {
+            if (isset($indexedExistingSections[$templateSection->getKey()])) {
+                $section = $indexedExistingSections[$templateSection->getKey()];
+                $section->setTitle($templateSection->getTitle());
+                $section->setType($templateSection->getType());
+                $section->setData($templateSection->getData());
+            } else {
+                $this->sections[] = $templateSection;
+            }
+        }
+
+        // Merge parameter data
+        $indexedExistingParameters = ObjectArrayUtils::indexArrayOfObjectsByMember("key", $this->getParameters() ?? []);
+        foreach ($newTemplateParameters as $templateParameter) {
+            if (isset($indexedExistingParameters[$templateParameter->getKey()])) {
+                $parameter = $indexedExistingParameters[$templateParameter->getKey()];
+                $parameter->setTitle($templateParameter->getTitle());
+                $parameter->setType($templateParameter->getType());
+                $parameter->setValue($templateParameter->getValue());
+            } else {
+                $this->parameters[] = $templateParameter;
+            }
+        }
+    }
+
 
     /**
      * @param MailingListSubscriber $subscriber

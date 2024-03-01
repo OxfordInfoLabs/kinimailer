@@ -75,7 +75,7 @@ class AdhocMailing {
      * @param string $ccAddresses
      * @param string $bccAddresses
      */
-    public function __construct($mailingId, $name, $emailAddress, array $sections, array $parameters, $title, $fromAddress, $replyToAddress, $ccAddresses, $bccAddresses) {
+    public function __construct($mailingId, $name, $emailAddress, array $sections = [], array $parameters = [], $title = null, $fromAddress = null, $replyToAddress = null, $ccAddresses = [], $bccAddresses = []) {
         $this->mailingId = $mailingId;
         $this->name = $name;
         $this->emailAddress = $emailAddress;
