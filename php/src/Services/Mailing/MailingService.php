@@ -421,6 +421,7 @@ class MailingService {
 
         // Send the email
         $email = new MailingEmail($fromAddress, $replyToAddress, [$sendAddress], $template, $toSubscriber, $attachments, $ccAddresses, $bccAddresses);
+
         $response = $this->emailService->send($email, $mailing->getAccountId());
 
         // Create a log entry

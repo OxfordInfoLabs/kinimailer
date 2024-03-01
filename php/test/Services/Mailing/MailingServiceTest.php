@@ -787,7 +787,7 @@ class MailingServiceTest extends TestBase {
         $updatedTemplate = new Template(new TemplateSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title",
             TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")],
-            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}',[], 1), null, 0);
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}',[], $templateId), null, 0);
 
 
 
