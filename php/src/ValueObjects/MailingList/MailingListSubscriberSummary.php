@@ -13,6 +13,12 @@ class MailingListSubscriberSummary {
      */
     private $name;
 
+
+    /**
+     * @var string
+     */
+    private $organisation;
+
     /**
      * @var string
      */
@@ -51,6 +57,7 @@ class MailingListSubscriberSummary {
      */
     public function __construct($mailingListSubscriber) {
         $this->name = $mailingListSubscriber->getName();
+        $this->organisation = $mailingListSubscriber->getOrganisation();
         $this->emailAddress = $mailingListSubscriber->getEmailAddress();
         $this->mobileNumber = $mailingListSubscriber->getMobileNumber();
         $this->isUser = $mailingListSubscriber->getUserId() ? true : false;
@@ -64,6 +71,13 @@ class MailingListSubscriberSummary {
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrganisation() {
+        return $this->organisation;
     }
 
     /**

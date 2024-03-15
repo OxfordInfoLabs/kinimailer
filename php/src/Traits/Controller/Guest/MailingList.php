@@ -38,7 +38,7 @@ trait MailingList {
         $preferences = new GuestMailingListSubscriberPreferences([
             $mailingListKey => 1
         ], $mailingListSubscriber->getEmailAddress(), $mailingListSubscriber->getMobileNumber(),
-            $mailingListSubscriber->getName());
+            $mailingListSubscriber->getName(), $mailingListSubscriber->getOrganisation());
 
 
         // Update subscription preferences

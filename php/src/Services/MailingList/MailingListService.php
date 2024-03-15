@@ -207,20 +207,30 @@ class MailingListService {
                     $existingSub = sizeof($existingSubs) ? $existingSubs[0] : null;
                 }
 
-                if ($subscribe && !$existingSub) {
+                if ($subscribe) {
 
-                    $newSubscriber = null;
-                    if ($userId) {
-                        $newSubscriber = new MailingListSubscriber($mailingListId, $userId);
-                    } else {
-                        $newSubscriber = new MailingListSubscriber($mailingListId, null,
-                            $mailingListSubscriberPreferences->getEmailAddress(), $mailingListSubscriberPreferences->getMobileNumber(),
-                            $mailingListSubscriberPreferences->getName());
+                    if (!$existingSub) {
+                        $newSubscriber = null;
+                        if ($userId) {
+                            $newSubscriber = new MailingListSubscriber($mailingListId, $userId);
+                        } else {
+                            $newSubscriber = new MailingListSubscriber($mailingListId, null,
+                                $mailingListSubscriberPreferences->getEmailAddress(), $mailingListSubscriberPreferences->getMobileNumber(),
+                                $mailingListSubscriberPreferences->getName(), $mailingListSubscriberPreferences->getOrganisation());
+                        }
+
+                        // Save if we have one
+                        if ($newSubscriber)
+                            $newSubscriber->save();
+                    } else if (!$userId){
+                        if ($mailingListSubscriberPreferences->getName())
+                            $existingSub->setName($mailingListSubscriberPreferences->getName());
+                        if ($mailingListSubscriberPreferences->getOrganisation())
+                            $existingSub->setOrganisation($mailingListSubscriberPreferences->getOrganisation());
+
+                        $existingSub->save();
                     }
 
-                    // Save if we have one
-                    if ($newSubscriber)
-                        $newSubscriber->save();
                 } else if (!$subscribe && $existingSub) {
                     $existingSub->remove();
                 }

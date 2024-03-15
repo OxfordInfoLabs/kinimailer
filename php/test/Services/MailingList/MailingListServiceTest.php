@@ -209,14 +209,15 @@ class MailingListServiceTest extends TestBase {
             "adminuseronly" => 1,
             "adminguest" => 1,
             "adminguest2" => 1
-        ], "test@noaccount.com", "07890 111111", "Test No Account");
+        ], "test@noaccount.com", "07890 111111", "Test No Account",
+            "My Organisation");
 
         $this->mailingListService->updateSubscriptionPreferences($preferences);
 
 
         // Check we subscribed
-        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND mailing_list_id IN (?,?,?) ",
-            "test@noaccount.com", "07890 111111", "Test No Account", $id1, $id2, $id3);
+        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND organisation = ? AND mailing_list_id IN (?,?,?) ",
+            "test@noaccount.com", "07890 111111", "Test No Account", "My Organisation", $id1, $id2, $id3);
 
         $this->assertEquals(2, sizeof($matches));
         $this->assertEquals($id2, $matches[0]->getMailingListId());
@@ -226,14 +227,14 @@ class MailingListServiceTest extends TestBase {
         $preferences = new GuestMailingListSubscriberPreferences([
             "adminguest" => 0,
             "adminguest2" => 1
-        ], "test@noaccount.com", "07890 111111", "Test No Account");
+        ], "test@noaccount.com", "07890 111111", "Test No Account", "Test alternative org");
 
         $this->mailingListService->updateSubscriptionPreferences($preferences);
 
 
         // Check we subscribed
-        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND mailing_list_id IN (?,?,?) ",
-            "test@noaccount.com", "07890 111111", "Test No Account", $id1, $id2, $id3);
+        $matches = MailingListSubscriber::filter("WHERE emailAddress = ? AND mobileNumber = ? AND name = ? AND organisation = ? AND mailing_list_id IN (?,?,?) ",
+            "test@noaccount.com", "07890 111111", "Test No Account", "Test alternative org", $id1, $id2, $id3);
 
         $this->assertEquals(1, sizeof($matches));
         $this->assertEquals($id3, $matches[0]->getMailingListId());

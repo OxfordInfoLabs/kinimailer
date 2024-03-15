@@ -101,6 +101,12 @@
                                 </div>
 
                                 <div class="col-span-6 sm:col-span-3">
+                                    <label class="block text-sm font-medium text-gray-700">Organisation (optional)</label>
+                                    <input type="text" name="name" [(ngModel)]="newSubscriber.organisation"
+                                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+
+                                <div class="col-span-6 sm:col-span-3">
                                     <label class="block text-sm font-medium text-gray-700">Email</label>
                                     <input type="email" name="emailAddress" [(ngModel)]="newSubscriber.emailAddress"
                                            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
@@ -131,6 +137,7 @@
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">Name</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Organisation</th>
                                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
                                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Mobile Number</th>
                                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
@@ -141,6 +148,7 @@
                                 <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr *ngFor="let subscriber of subscribers">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{subscriber.name}}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{subscriber.organisation}}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{subscriber.emailAddress}}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{subscriber.mobileNumber}}</td>
                                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">

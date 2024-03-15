@@ -19,11 +19,12 @@ class GuestMailingListSubscriberPreferences extends MailingListSubscriberPrefere
      * @param string $mobileNumber
      * @param string $name
      */
-    public function __construct($mailingListPreferences, $emailAddress = null, $mobileNumber = null, $name = null) {
+    public function __construct($mailingListPreferences, $emailAddress = null, $mobileNumber = null, $name = null, $organisation = null) {
         parent::__construct($mailingListPreferences);
         $this->emailAddress = $emailAddress;
         $this->mobileNumber = $mobileNumber;
         $this->name = $name;
+        $this->organisation = $organisation;
     }
 
 

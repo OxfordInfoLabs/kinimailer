@@ -37,6 +37,12 @@ class MailingListSubscriber extends ActiveRecord {
      */
     private $name;
 
+
+    /**
+     * @var string
+     */
+    private $organisation;
+
     /**
      * @var string
      */
@@ -63,10 +69,11 @@ class MailingListSubscriber extends ActiveRecord {
      * @param string $mobileNumber
      * @param string $name
      */
-    public function __construct($mailingListId, $userId = null, $emailAddress = null, $mobileNumber = null, $name = null) {
+    public function __construct($mailingListId, $userId = null, $emailAddress = null, $mobileNumber = null, $name = null, $organisation = null) {
         $this->mailingListId = $mailingListId;
         $this->userId = $userId;
         $this->name = $name;
+        $this->organisation = $organisation;
         $this->emailAddress = $emailAddress;
         $this->mobileNumber = $mobileNumber;
 
@@ -126,6 +133,20 @@ class MailingListSubscriber extends ActiveRecord {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrganisation() {
+        return $this->organisation;
+    }
+
+    /**
+     * @param mixed|string|null $organisation
+     */
+    public function setOrganisation($organisation) {
+        $this->organisation = $organisation;
     }
 
 

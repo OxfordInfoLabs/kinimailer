@@ -25,6 +25,12 @@ trait GuestMailingListSubscriberTrait {
 
 
     /**
+     * @var string
+     */
+    private $organisation;
+
+
+    /**
      * @return string
      */
     public function getEmailAddress() {
@@ -64,6 +70,20 @@ trait GuestMailingListSubscriberTrait {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrganisation() {
+        return $this->organisation;
+    }
+
+    /**
+     * @param string $organisation
+     */
+    public function setOrganisation($organisation) {
+        $this->organisation = $organisation;
     }
 
 
