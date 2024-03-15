@@ -41,20 +41,27 @@ class MailingListSummary extends ActiveRecord {
 
 
     /**
+     * @var integer
+     */
+    protected $autoResponderMailingId;
+
+    /**
      * MailingListSummary constructor.
      *
      * @param string $key
      * @param string $title
      * @param string $description
      * @param boolean $anonymousSignUp
+     * @param integer $autoResponderMailingId
      * @param integer $id
      */
-    public function __construct($key, $title, $description = null, $anonymousSignUp = false, $id = null) {
+    public function __construct($key, $title, $description = null, $anonymousSignUp = false, $autoResponderMailingId = null, $id = null) {
         $this->key = $key;
         $this->title = $title;
         $this->description = $description;
         $this->anonymousSignUp = $anonymousSignUp;
         $this->id = $id;
+        $this->autoResponderMailingId = $autoResponderMailingId;
     }
 
 
@@ -93,6 +100,13 @@ class MailingListSummary extends ActiveRecord {
      */
     public function isAnonymousSignUp() {
         return $this->anonymousSignUp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAutoResponderMailingId() {
+        return $this->autoResponderMailingId;
     }
 
 

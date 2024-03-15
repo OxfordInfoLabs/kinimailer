@@ -6,10 +6,12 @@ use Kiniauth\Objects\Account\Account;
 use Kiniauth\Objects\Security\User;
 use Kiniauth\Objects\Security\UserSummary;
 use Kiniauth\Services\Application\Session;
+use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Logging\Logger;
 use Kinimailer\Objects\MailingList\MailingList;
 use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\MailingList\MailingListSummary;
+use Kinimailer\Services\Mailing\MailingService;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriberPreferences;
 use Kinimailer\ValueObjects\MailingList\MailingListSubscriberPreferences;
 use Kinimailer\ValueObjects\MailingList\UserMailingListSubscriberPreferences;
@@ -28,13 +30,32 @@ class MailingListService {
 
 
     /**
+     * @var MailingService
+     */
+    private $mailingService;
+
+
+    /**
      * MailingListService constructor.
+     *
      * @param Session $session
      */
     public function __construct($session) {
         $this->session = $session;
     }
 
+    /**
+     * @param MailingService $mailingService
+     */
+    public function setMailingService($mailingService) {
+        $this->mailingService = $mailingService;
+    }
+
+
+    // Get mailing service.  Implemented specifically to prevent recursion with mailing service
+    private function getMailingService() {
+        return $this->mailingService ?? Container::instance()->get(MailingService::class);
+    }
 
     /**
      * Get a mailing list by id
@@ -120,7 +141,7 @@ class MailingListService {
      */
     public function isKeyAvailableForMailingList($proposedKey, $proposedMailingListId = null, $accountId = Account::LOGGED_IN_ACCOUNT) {
 
-        $mailingList = new MailingList(new MailingListSummary($proposedKey, "", "", false, $proposedMailingListId), null, $accountId ?? 0);
+        $mailingList = new MailingList(new MailingListSummary($proposedKey, "", "", false, null, $proposedMailingListId), null, $accountId ?? 0);
         return !sizeof($mailingList->validate());
 
     }
@@ -184,11 +205,14 @@ class MailingListService {
             $userId = $mailingListSubscriberPreferences->getUserId();
         }
 
+
         // Grab all mailing lists one at a time by key.
         foreach ($mailingListSubscriberPreferences->getMailingListPreferences() ?? [] as $mailingListKey => $subscribe) {
 
+
             // Get the mailing list
             $mailingList = $this->getMailingListByKey($mailingListKey, $parentAccountId);
+
 
             // If mailing list is anonymous or the user is not anonymous we can continue.
             if ($mailingList && ($mailingList->isAnonymousSignUp() || $userId)) {
@@ -222,7 +246,15 @@ class MailingListService {
                         // Save if we have one
                         if ($newSubscriber)
                             $newSubscriber->save();
-                    } else if (!$userId){
+
+                        if ($mailingList->getAutoResponderMailingId()) {
+                            $this->getMailingService()->processSingleMailingListSubscriberMailing($mailingList->getAutoResponderMailingId(),
+                                $mailingList->getKey(),
+                                $newSubscriber->getEmailAddress());
+                        }
+
+
+                    } else if (!$userId) {
                         if ($mailingListSubscriberPreferences->getName())
                             $existingSub->setName($mailingListSubscriberPreferences->getName());
                         if ($mailingListSubscriberPreferences->getOrganisation())

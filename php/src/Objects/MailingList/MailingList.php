@@ -28,7 +28,7 @@ class MailingList extends MailingListSummary {
      */
     public function __construct($mailingListSummary, $projectKey = null, $accountId = null) {
         if ($mailingListSummary) {
-            parent::__construct($mailingListSummary->getKey(), $mailingListSummary->getTitle(), $mailingListSummary->getDescription(), $mailingListSummary->isAnonymousSignUp(), $mailingListSummary->getId());
+            parent::__construct($mailingListSummary->getKey(), $mailingListSummary->getTitle(), $mailingListSummary->getDescription(), $mailingListSummary->isAnonymousSignUp(), $mailingListSummary->getAutoResponderMailingId(), $mailingListSummary->getId());
         }
         $this->projectKey = $projectKey;
         $this->accountId = $accountId;
@@ -85,7 +85,7 @@ class MailingList extends MailingListSummary {
      * @return MailingListSummary
      */
     public function returnSummary() {
-        return new MailingListSummary($this->key, $this->title, $this->description, $this->anonymousSignUp, $this->id);
+        return new MailingListSummary($this->key, $this->title, $this->description, $this->anonymousSignUp, $this->autoResponderMailingId, $this->id);
     }
 
 

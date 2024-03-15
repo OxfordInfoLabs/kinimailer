@@ -4,11 +4,13 @@ namespace Kinimailer\Services\MailingList;
 
 use Kiniauth\Test\Services\Security\AuthenticationHelper;
 use Kinikit\Core\DependencyInjection\Container;
+use Kinikit\Core\Testing\MockObjectProvider;
 use Kinikit\Core\Validation\ValidationException;
 use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
 use Kinimailer\Objects\MailingList\MailingList;
 use Kinimailer\Objects\MailingList\MailingListSubscriber;
 use Kinimailer\Objects\MailingList\MailingListSummary;
+use Kinimailer\Services\Mailing\MailingService;
 use Kinimailer\TestBase;
 use Kinimailer\ValueObjects\MailingList\GuestMailingListSubscriberPreferences;
 use Kinimailer\ValueObjects\MailingList\UserMailingListSubscriberPreferences;
@@ -22,11 +24,19 @@ class MailingListServiceTest extends TestBase {
      */
     private $mailingListService;
 
+
+    /**
+     * @var MailingService
+     */
+    private $mailingService;
+
     /**
      * Mailing list service
      */
     public function setUp(): void {
+        $this->mailingService = MockObjectProvider::instance()->getMockInstance(MailingService::class);
         $this->mailingListService = Container::instance()->get(MailingListService::class);
+        $this->mailingListService->setMailingService($this->mailingService);
     }
 
     public function testCanCreateReadUpdateAndDeleteMailingListAsSuperAdmin() {
@@ -48,7 +58,7 @@ class MailingListServiceTest extends TestBase {
         $this->assertEquals($reList->returnSummary(), $reSummary);
 
         // Update one
-        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, $newId);
+        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, 1, $newId);
         $this->mailingListService->saveMailingList($update);
 
         $reSummary = $this->mailingListService->getMailingList($newId);
@@ -72,7 +82,7 @@ class MailingListServiceTest extends TestBase {
 
         AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
 
-        $mailingList = new MailingListSummary("newone", "New Mailing List", "My New test mailing list");
+        $mailingList = new MailingListSummary("newone", "New Mailing List", "My New test mailing list", false, 3);
         $newId = $this->mailingListService->saveMailingList($mailingList);
         $this->assertNotNull($newId);
         $reList = MailingList::fetch($newId);
@@ -80,6 +90,7 @@ class MailingListServiceTest extends TestBase {
         $this->assertEquals("New Mailing List", $reList->getTitle());
         $this->assertEquals("My New test mailing list", $reList->getDescription());
         $this->assertFalse($reList->isAnonymousSignUp());
+        $this->assertEquals(3, $reList->getAutoResponderMailingId());
         $this->assertSame(1, $reList->getAccountId());
 
         // Check can get one
@@ -87,7 +98,7 @@ class MailingListServiceTest extends TestBase {
         $this->assertEquals($reList->returnSummary(), $reSummary);
 
         // Update one
-        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, $newId);
+        $update = new MailingListSummary("updatedone", "Updated Mailing List", "Updated Mailing", true, null, $newId);
         $this->mailingListService->saveMailingList($update);
 
         $reSummary = $this->mailingListService->getMailingList($newId);
@@ -293,6 +304,8 @@ class MailingListServiceTest extends TestBase {
     }
 
 
+
+
     public function testCanUnsubscribeSingleSubscriptionUsingUnsubscribeKey() {
 
         AuthenticationHelper::login("admin@kinicart.com", "password");
@@ -360,5 +373,59 @@ class MailingListServiceTest extends TestBase {
 
         AuthenticationHelper::logout();
     }
+
+
+    public function testIfAutoResponderSetForMailingMailingIsSentOnNewSubscriptionToSubscriber() {
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+
+        $mailingList = new MailingListSummary("brandnewml", "New Mailing List", "My New test mailing list", true, 3);
+        $this->mailingListService->saveMailingList($mailingList);
+
+        AuthenticationHelper::logout();
+
+        $preferences = new GuestMailingListSubscriberPreferences([
+            "brandnewml" => 1
+        ], "test@noaccount.com", "07890 111111", "Test No Account",
+            "My Organisation");
+
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+        $this->assertTrue($this->mailingService->methodWasCalled("processSingleMailingListSubscriberMailing", [
+            3, "brandnewml", "test@noaccount.com"
+        ]));
+
+
+        // Check no double call if update
+        $this->mailingService->resetMethodCallHistory("processSingleMailingListSubscriberMailing");
+
+
+        $preferences = new GuestMailingListSubscriberPreferences([
+            "brandnewml" => 1
+        ], "test@noaccount.com", "07890 111111", "Name update",
+            "My Organisation");
+
+
+        $this->assertFalse($this->mailingService->methodWasCalled("processSingleMailingListSubscriberMailing", [
+            3, "brandnewml", "test@noaccount.com"
+        ]));
+
+
+
+        $preferences = new GuestMailingListSubscriberPreferences([
+            "brandnewml" => 1
+        ], "another@noaccount.com", "07890 111111", "Test No Account",
+            "My Organisation");
+
+
+        $this->mailingListService->updateSubscriptionPreferences($preferences);
+
+        $this->assertTrue($this->mailingService->methodWasCalled("processSingleMailingListSubscriberMailing", [
+            3, "brandnewml", "another@noaccount.com"
+        ]));
+
+    }
+
 
 }
