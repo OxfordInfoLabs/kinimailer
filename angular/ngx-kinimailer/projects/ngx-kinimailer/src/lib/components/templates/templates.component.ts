@@ -13,7 +13,7 @@ export class TemplatesComponent implements OnInit {
 
     public templates: any = [];
     public searchText = new BehaviorSubject('');
-    public limit = 1000;
+    public limit = 10;
     public offset = 0;
     public page = 1;
     public endOfResults = false;
@@ -47,6 +47,25 @@ export class TemplatesComponent implements OnInit {
             this.page = 1;
             this.offset = 0;
         });
+    }
+
+    public increaseOffset() {
+        this.page = this.page + 1;
+        this.offset = (this.limit * this.page) - this.limit;
+        this.reload.next(Date.now());
+    }
+
+    public decreaseOffset() {
+        this.page = this.page <= 1 ? 1 : this.page - 1;
+        this.offset = (this.limit * this.page) - this.limit;
+        this.reload.next(Date.now());
+    }
+
+    public pageSizeChange(value) {
+        this.page = 1;
+        this.offset = 0;
+        this.limit = value;
+        this.reload.next(Date.now());
     }
 
     private getTemplates() {

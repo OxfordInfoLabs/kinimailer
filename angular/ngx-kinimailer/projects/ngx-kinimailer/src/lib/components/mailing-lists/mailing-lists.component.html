@@ -71,39 +71,39 @@
                                 {{mailingList.description}}
                             </td>
                         </tr>
-<!--                        <tr>-->
-<!--                            <td colspan="6"-->
-<!--                                class="bg-gray-50 whitespace-nowrap border-b border-gray-200 py-2 px-4 text-sm text-gray-900">-->
-<!--                                <div class="paging-toolbar flex align-center justify-end">-->
+                        <tr>
+                            <td colspan="6"
+                                class="bg-gray-50 whitespace-nowrap border-b border-gray-200 py-2 px-4 text-sm text-gray-900">
+                                <div class="paging-toolbar flex align-center justify-end">
 
-<!--                                    <div class="flex items-center justify-center">-->
-<!--                                        <div class="text-xs text-gray-400 mr-10">-->
-<!--                                            Showing {{snapshots.project.offset + 1}} - {{(snapshots.project.page * snapshots.project.limit) - (snapshots.project.limit - snapshots.project.data.length)}}-->
-<!--                                        </div>-->
-<!--                                        <select [value]="snapshots.project.limit"-->
-<!--                                                (change)="pageSizeChange($event.target.value, snapshots.project)"-->
-<!--                                                class="mr-8 p-2">-->
-<!--                                            <option [value]="1">1</option>-->
-<!--                                            <option [value]="5">5</option>-->
-<!--                                            <option [value]="10">10</option>-->
-<!--                                            <option [value]="25">25</option>-->
-<!--                                            <option [value]="50">50</option>-->
-<!--                                            <option [value]="100">100</option>-->
-<!--                                            <option [value]="250">250</option>-->
-<!--                                            <option [value]="1000">1000</option>-->
-<!--                                        </select>-->
-<!--                                        <button mat-icon-button class="mr-4" (click)="decreaseOffset(snapshots.project)"-->
-<!--                                                [disabled]="snapshots.project.page <= 1">-->
-<!--                                            <mat-icon>chevron_left</mat-icon>-->
-<!--                                        </button>-->
-<!--                                        <button mat-icon-button (click)="increaseOffset(snapshots.project)"-->
-<!--                                                [disabled]="snapshots.project.endOfResults">-->
-<!--                                            <mat-icon>chevron_right</mat-icon>-->
-<!--                                        </button>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </td>-->
-<!--                        </tr>-->
+                                    <div class="flex items-center justify-center">
+                                        <div class="text-xs text-gray-400 mr-10">
+                                            Showing {{offset + 1}} - {{(page * limit) - (limit - mailingLists.length)}}
+                                        </div>
+                                        <select [value]="limit"
+                                                (change)="pageSizeChange($any($event).target.value)"
+                                                class="mr-8 p-2">
+                                            <option [value]="1">1</option>
+                                            <option [value]="5">5</option>
+                                            <option [value]="10">10</option>
+                                            <option [value]="25">25</option>
+                                            <option [value]="50">50</option>
+                                            <option [value]="100">100</option>
+                                            <option [value]="250">250</option>
+                                            <option [value]="1000">1000</option>
+                                        </select>
+                                        <button mat-icon-button class="mr-4" (click)="decreaseOffset()"
+                                                [disabled]="page <= 1">
+                                            <mat-icon>chevron_left</mat-icon>
+                                        </button>
+                                        <button mat-icon-button (click)="increaseOffset()"
+                                                [disabled]="endOfResults">
+                                            <mat-icon>chevron_right</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </ng-template>
 

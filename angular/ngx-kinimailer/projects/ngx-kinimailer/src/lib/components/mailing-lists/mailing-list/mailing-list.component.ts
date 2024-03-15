@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MailingListService} from '../../../services/mailing-list.service';
 import {ActivatedRoute} from '@angular/router';
+import {MailingService} from '../../../services/mailing.service';
 
 @Component({
     selector: 'km-mailing-list',
@@ -14,14 +15,16 @@ export class MailingListComponent implements OnInit {
     public subscribers: any = [];
     public newSubscriber: any = {};
     public showNewSubscriber = true;
+    public mailings: any = [];
 
     private mailingListId = null;
 
     constructor(private mailingListService: MailingListService,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                private mailingService: MailingService) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
         this.route.params.subscribe((params: any) => {
             this.mailingListId = Number(params.id);
             if (this.mailingListId) {
@@ -30,6 +33,8 @@ export class MailingListComponent implements OnInit {
                 this.proposedKeyOk = false;
             }
         });
+
+        this.mailings = await this.mailingService.filterMailings('', '0', '1000').toPromise();
     }
 
     public cancelNewSubscriber() {

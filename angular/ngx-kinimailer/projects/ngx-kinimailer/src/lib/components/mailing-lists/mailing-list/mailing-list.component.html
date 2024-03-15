@@ -56,6 +56,15 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Auto Responder Mailing</label>
+                                <select class="w-full" [(ngModel)]="mailingList.autoResponderMailingId">
+                                    <option *ngFor="let mailing of mailings" [value]="mailing.id">
+                                        {{mailing.title}}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">

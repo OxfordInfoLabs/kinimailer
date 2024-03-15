@@ -43,6 +43,25 @@ export class MailingsComponent implements OnInit {
         });
     }
 
+    public increaseOffset() {
+        this.page = this.page + 1;
+        this.offset = (this.limit * this.page) - this.limit;
+        this.reload.next(Date.now());
+    }
+
+    public decreaseOffset() {
+        this.page = this.page <= 1 ? 1 : this.page - 1;
+        this.offset = (this.limit * this.page) - this.limit;
+        this.reload.next(Date.now());
+    }
+
+    public pageSizeChange(value) {
+        this.page = 1;
+        this.offset = 0;
+        this.limit = value;
+        this.reload.next(Date.now());
+    }
+
     private getMailings() {
         return this.mailingService.filterMailings(
             this.searchText.getValue() || '',

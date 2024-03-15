@@ -18,7 +18,7 @@ export class MailingProfilesComponent implements OnInit {
 
     public mailingProfiles: any = [];
     public mailingProfileSearchText = new BehaviorSubject('');
-    public limit = 10;
+    public limit = 1000;
     public offset = 0;
     public page = 1;
     public endOfResults = false;
