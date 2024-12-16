@@ -27,7 +27,6 @@ trait MailingList {
      * Subscribe to a single mailing list
      *
      * @http POST /subscribe/$mailingListKey
-     * @rateLimit 5
      *
      * @param string $mailingListKey
      * @param GuestMailingListSubscriber $mailingListSubscriber
