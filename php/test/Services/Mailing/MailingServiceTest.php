@@ -12,6 +12,7 @@ use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskSummary;
 use Kiniauth\Objects\Workflow\Task\Scheduled\ScheduledTaskTimePeriod;
 use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
+use Kiniauth\Services\Security\ActiveRecordInterceptor;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTaskService;
 use Kiniauth\Test\Services\Security\AuthenticationHelper;
 use Kinikit\Core\Communication\Email\Attachment\StringEmailAttachment;
@@ -19,6 +20,7 @@ use Kinikit\Core\Communication\Email\Email;
 use Kinikit\Core\DependencyInjection\Container;
 use Kinikit\Core\Testing\MockObjectProvider;
 use Kinikit\MVC\Request\FileUpload;
+use Kinikit\Persistence\ORM\Exception\ObjectNotFoundException;
 use Kinimailer\Controllers\Account\MailingList;
 use Kinimailer\Objects\Mailing\Mailing;
 use Kinimailer\Objects\Mailing\MailingEmail;
@@ -90,7 +92,9 @@ class MailingServiceTest extends TestBase {
         $this->emailService = MockObjectProvider::instance()->getMockInstance(EmailService::class);
         $this->mailingListService = MockObjectProvider::instance()->getMockInstance(MailingListService::class);
         $this->attachmentService = Container::instance()->get(AttachmentService::class);
-        $this->mailingService = new MailingService($this->emailService, $this->templateService, $this->mailingListService, $this->attachmentService);
+        $this->mailingService = new MailingService($this->emailService, $this->templateService, $this->mailingListService,
+            $this->attachmentService, Container::instance()->get(ActiveRecordInterceptor::class));
+
 
     }
 
@@ -111,7 +115,7 @@ class MailingServiceTest extends TestBase {
 
         $mailingSummary = new MailingSummary("Test Mailing", [new TemplateSection("main", "Main", "text", "Hello world")], [new TemplateParameter("param1", "Param 1", "text", "Test")], $templateSummary,
             MailingSummary::STATUS_DRAFT, [1, 3, 5], [1, 7, 9], ["bing@bong.com", "me@test.com"], $mailingProfileSummary,
-            $scheduledTaskSummary);
+            $scheduledTaskSummary, [], false);
         $mailingId = $this->mailingService->saveMailing($mailingSummary, null, 0);
 
         $attachment = new Attachment(new AttachmentSummary("hello.txt", "text/text", "Mailing", $mailingId, null, null, 0));
@@ -154,7 +158,7 @@ class MailingServiceTest extends TestBase {
 
 
         $mailingSummary = new MailingSummary("Test Mailing", [new TemplateSection("main", "Main", "text", "Hello world")], [new TemplateParameter("param1", "Param 1", "text", "Test")], $templateSummary,
-            MailingSummary::STATUS_DRAFT, [1, 3, 5], [1, 7, 9], ["bing@bong.com", "me@test.com"]);
+            MailingSummary::STATUS_DRAFT, [1, 3, 5], [1, 7, 9], ["bing@bong.com", "me@test.com"], null, null, [], false);
         $mailingId = $this->mailingService->saveMailing($mailingSummary, null, 0);
 
 
@@ -196,7 +200,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, null, null, [
                 "mark@hello.com", "james@hello.com"
-            ], $profile, null);
+            ], $profile, null, [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -273,7 +277,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
-            ], null, null, $profile, null);
+            ], null, null, $profile, null, [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -381,7 +385,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
-            ], null, null, $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+            ], null, null, $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -489,7 +493,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, null, null, [
                 "mark@hello.com", "james@hello.com"
-            ], $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+            ], $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -560,7 +564,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, null, null, [
                 "mark@hello.com", "james@hello.com"
-            ], $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+            ], $profile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
 
 
         // Set sending status
@@ -603,7 +607,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test Mailing", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, null, null, [
                 "mark@hello.com", "james@hello.com"
-            ], $profile, null);
+            ], $profile, null, [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -696,7 +700,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
-            ], null, null, null, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+            ], null, null, null, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -771,7 +775,7 @@ class MailingServiceTest extends TestBase {
         $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
             [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
                 1, 2, 3
-            ], null, null, $mailingProfile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]));
+            ], null, null, $mailingProfile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
 
         $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
 
@@ -807,6 +811,91 @@ class MailingServiceTest extends TestBase {
         $this->mailingService->processAdhocMailing($adhocMailing);
 
 
+
+        // Check mailing log entries stored correctly
+        $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");
+        $this->assertEquals(1, sizeof($mailingLogSets));
+        $logSet = $mailingLogSets[0];
+        $logEntries = $logSet->getLogEntries();
+        $this->assertEquals(1, sizeof($logEntries));
+
+        $this->assertEquals("Mark Test <mark@test.com>", $logEntries[0]->getEmailAddress());
+        $this->assertEquals(StoredEmailSummary::STATUS_SENT, $logEntries[0]->getStatus());
+        $this->assertNull($logEntries[0]->getFailureMessage());
+        $this->assertEquals(55, $logEntries[0]->getAssociatedItemId());
+
+
+    }
+
+    public function testCanTriggerAdhocMailingFromAnotherAccountOnlyIfBooleanSupplied(){
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+
+        $template = new TemplateSummary("Main Title", [new TemplateSection("top", "Top Section",
+            TemplateSection::TYPE_HTML)],
+            [new TemplateParameter("param1", "Param 1", TemplateParameter::TYPE_TEXT)],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}');
+
+        $templateId = $this->templateService->saveTemplate($template, null, 0);
+        $template = $this->templateService->getTemplate($templateId);
+
+        $mailingProfile = new MailingProfile(new MailingProfileSummary("Example", "from@myorg.com", "replyto@myorg.com"), null, 0);
+        $mailingProfile->save();
+
+
+        $mailing = new MailingSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title", TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+            [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")], $template, MailingSummary::STATUS_DRAFT, [
+                1, 2, 3
+            ], null, null, $mailingProfile, new ScheduledTaskSummary(null, null, null, [new ScheduledTaskTimePeriod(11, null, 10, 23)]), [], false);
+
+        $mailingId = $this->mailingService->saveMailing($mailing, null, 0);
+
+
+        $adhocMailing = new AdhocMailing($mailingId, "Mark Test", "mark@test.com");
+
+
+        $updatedTemplate = new Template(new TemplateSummary("Test {{params.param1}}", [new TemplateSection("top", "Main Title",
+            TemplateSection::TYPE_HTML, ["value" => '<p>Thanks for coming</p>'])],
+            [new TemplateParameter("param1", "Parameter 1", TemplateParameter::TYPE_TEXT, "Joe Bloggs")],
+            '<h1>Welcome {{params.param1}}</h1>{{sections.top}}',[], $templateId), null, 0);
+
+
+
+        // Programme email responses
+        $this->emailService->returnValue("send",
+            new StoredEmailSendResult(StoredEmailSendResult::STATUS_SENT, null, 55),
+            [
+                new MailingEmail("from@myorg.com", "replyto@myorg.com", ["Mark Test <mark@test.com>"], $updatedTemplate,
+                    new MailingListSubscriber($mailingId, null, "mark@test.com", null, "Mark Test"),
+                    [],
+                    [], []), 0
+            ]);
+
+
+
+        // Login as another user.
+        AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
+
+        try {
+            $this->mailingService->processAdhocMailing($adhocMailing);
+        } catch(ObjectNotFoundException $e){
+            // Fine
+        }
+
+        // Allow login from other accounts
+        AuthenticationHelper::login("admin@kinicart.com", "password");
+        $mailing = Mailing::fetch($mailingId);
+        $mailing->setAllowAdhocTriggerFromOtherAccounts(true);
+        $mailing->save();
+
+        // Login as another user.
+        AuthenticationHelper::login("sam@samdavisdesign.co.uk", "password");
+
+        // Should work this time !
+        $this->mailingService->processAdhocMailing($adhocMailing);
+
+
+        AuthenticationHelper::login("admin@kinicart.com", "password");
 
         // Check mailing log entries stored correctly
         $mailingLogSets = MailingLogSet::filter("WHERE mailing_id = $mailingId");

@@ -97,6 +97,12 @@ class MailingSummary extends ActiveRecord {
     protected $attachments;
 
 
+    /**
+     * @var boolean
+     */
+    protected $allowAdhocTriggerFromOtherAccounts = false;
+
+
     const STATUS_DRAFT = "draft";
     const STATUS_SENDING = "sending";
     const STATUS_SCHEDULED = "scheduled";
@@ -115,9 +121,10 @@ class MailingSummary extends ActiveRecord {
      * @param MailingProfileSummary $mailingProfile
      * @param ScheduledTaskSummary $scheduledTask
      * @param AttachmentSummary[] $attachments
+     * @param $allowAdhocTriggerFromOtherAccounts
      * @param int $id
      */
-    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $attachments = [], $id = null) {
+    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $attachments = [], $allowAdhocTriggerFromOtherAccounts, $id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->templateSections = $templateSections;
@@ -130,6 +137,7 @@ class MailingSummary extends ActiveRecord {
         $this->mailingProfile = $mailingProfile;
         $this->scheduledTask = $scheduledTask;
         $this->attachments = $attachments;
+        $this->allowAdhocTriggerFromOtherAccounts = $allowAdhocTriggerFromOtherAccounts;
     }
 
     /**
@@ -316,6 +324,22 @@ class MailingSummary extends ActiveRecord {
     public function setLogSets($logSets) {
         $this->logSets = $logSets;
     }
+
+    /**
+     * @return bool
+     */
+    public function isAllowAdhocTriggerFromOtherAccounts() {
+        return $this->allowAdhocTriggerFromOtherAccounts;
+    }
+
+    /**
+     * @param bool $allowAdhocTriggerFromOtherAccounts
+     */
+    public function setAllowAdhocTriggerFromOtherAccounts($allowAdhocTriggerFromOtherAccounts) {
+        $this->allowAdhocTriggerFromOtherAccounts = $allowAdhocTriggerFromOtherAccounts;
+    }
+
+
 
 
 }

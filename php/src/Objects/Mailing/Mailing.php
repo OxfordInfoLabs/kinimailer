@@ -62,6 +62,7 @@ class Mailing extends MailingSummary {
                 $mailingSummary->getMailingProfile() ? new MailingProfile($mailingSummary->getMailingProfile(), $projectKey, $accountId) : null,
                 $mailingSummary->getScheduledTask() ? new ScheduledTask($mailingSummary->getScheduledTask(), $projectKey, $accountId) : null,
                 $mailingSummary->getAttachments() ?? [],
+                $mailingSummary->isAllowAdhocTriggerFromOtherAccounts(),
                 $mailingSummary->getId()
             );
         }
@@ -127,7 +128,7 @@ class Mailing extends MailingSummary {
             $this->emailAddresses,
             $this->mailingProfile ? $this->mailingProfile->returnSummary() : null,
             $this->scheduledTask ? $this->scheduledTask->returnSummary() : null,
-            $this->attachments,
+            $this->attachments, $this->allowAdhocTriggerFromOtherAccounts,
             $this->id
         );
     }

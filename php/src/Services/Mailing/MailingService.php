@@ -7,6 +7,7 @@ use Kiniauth\Objects\Attachment\AttachmentSummary;
 use Kiniauth\Objects\Attachment\Attachment;
 use Kiniauth\Services\Attachment\AttachmentService;
 use Kiniauth\Services\Communication\Email\EmailService;
+use Kiniauth\Services\Security\ActiveRecordInterceptor;
 use Kiniauth\Services\Workflow\Task\LongRunning\LongRunningTask;
 use Kinikit\Core\Communication\Email\Attachment\StringEmailAttachment;
 use Kinikit\Core\Communication\Email\Email;
@@ -53,18 +54,25 @@ class MailingService {
     private $attachmentService;
 
     /**
+     * @var ActiveRecordInterceptor
+     */
+    private $activeRecordInterceptor;
+
+    /**
      * MailingService constructor.
      *
      * @param EmailService $emailService
      * @param TemplateService $templateService
      * @param MailingListService $mailingListService
      * @param AttachmentService $attachmentService
+     * @param ActiveRecordInterceptor $activeRecordInterceptor
      */
-    public function __construct($emailService, $templateService, $mailingListService, $attachmentService) {
+    public function __construct($emailService, $templateService, $mailingListService, $attachmentService, $activeRecordInterceptor) {
         $this->emailService = $emailService;
         $this->templateService = $templateService;
         $this->mailingListService = $mailingListService;
         $this->attachmentService = $attachmentService;
+        $this->activeRecordInterceptor = $activeRecordInterceptor;
     }
 
 
@@ -80,7 +88,7 @@ class MailingService {
             $mailing = Mailing::fetch($id);
             return $mailing->returnSummary();
         } catch (ObjectNotFoundException $e) {
-            return new MailingSummary();
+            return new MailingSummary(null, null, null, null, self::STATUS_DRAFT, null, null, null, null, null, [], false);
         }
     }
 
@@ -307,36 +315,51 @@ class MailingService {
      */
     public function processAdhocMailing($adhocMailing) {
 
-        /**
-         * @var Mailing $mailing
-         */
-        $mailing = Mailing::fetch($adhocMailing->getMailingId());
+        $otherAccountAccess = null;
+        $this->activeRecordInterceptor->executeInsecure(function () use (&$otherAccountAccess, $adhocMailing) {
+            $mailing = Mailing::fetch($adhocMailing->getMailingId());
+            $otherAccountAccess = $mailing->isAllowAdhocTriggerFromOtherAccounts();
+        });
 
-        /**
-         * @var MailingListSubscriber $subscriber
-         */
-        $subscriber = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
+        $executable = function () use ($adhocMailing) {
 
-        $ccAddresses = [];
-        if ($adhocMailing->getCcAddresses()) {
-            foreach (explode(",", $adhocMailing->getCcAddresses()) as $item) {
-                $ccAddresses[] = trim($item);
+            /**
+             * @var Mailing $mailing
+             */
+            $mailing = Mailing::fetch($adhocMailing->getMailingId());
+
+            /**
+             * @var MailingListSubscriber $subscriber
+             */
+            $subscriber = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
+
+            $ccAddresses = [];
+            if ($adhocMailing->getCcAddresses()) {
+                foreach (explode(",", $adhocMailing->getCcAddresses()) as $item) {
+                    $ccAddresses[] = trim($item);
+                }
             }
-        }
 
-        $bccAddresses = [];
-        if ($adhocMailing->getBccAddresses()) {
-            foreach (explode(",", $adhocMailing->getBccAddresses()) as $item) {
-                $bccAddresses[] = trim($item);
+            $bccAddresses = [];
+            if ($adhocMailing->getBccAddresses()) {
+                foreach (explode(",", $adhocMailing->getBccAddresses()) as $item) {
+                    $bccAddresses[] = trim($item);
+                }
             }
+
+            // Send the single mailing
+            $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(),
+                $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
+                $ccAddresses,
+                $bccAddresses);
+
+        };
+
+        if ($otherAccountAccess) {
+            $this->activeRecordInterceptor->executeInsecure($executable);
+        } else {
+            $executable();
         }
-
-
-        // Send the single mailing
-        $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(),
-            $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
-            $ccAddresses,
-            $bccAddresses);
 
     }
 
