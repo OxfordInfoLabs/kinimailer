@@ -88,7 +88,7 @@ class MailingService {
             $mailing = Mailing::fetch($id);
             return $mailing->returnSummary();
         } catch (ObjectNotFoundException $e) {
-            return new MailingSummary(null, null, null, null, self::STATUS_DRAFT, null, null, null, null, null, [], false);
+            return new MailingSummary();
         }
     }
 

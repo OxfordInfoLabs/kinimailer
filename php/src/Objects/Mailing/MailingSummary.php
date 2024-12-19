@@ -124,7 +124,7 @@ class MailingSummary extends ActiveRecord {
      * @param $allowAdhocTriggerFromOtherAccounts
      * @param int $id
      */
-    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $attachments = [], $allowAdhocTriggerFromOtherAccounts, $id = null) {
+    public function __construct($title = null, $templateSections = null, $templateParameters = null, $template = null, $status = self::STATUS_DRAFT, $mailingListIds = null, $userIds = null, $emailAddresses = null, $mailingProfile = null, $scheduledTask = null, $attachments = [], $allowAdhocTriggerFromOtherAccounts = false, $id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->templateSections = $templateSections;
