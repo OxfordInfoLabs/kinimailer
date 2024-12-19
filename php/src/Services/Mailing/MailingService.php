@@ -308,7 +308,7 @@ class MailingService {
 
 
     /**
-     * Process an adhoc mailing to a single recipient.
+     * Process an adhoc mailing to a single recipient or attached mailing lists.
      *
      * @param AdhocMailing $adhocMailing
      * @return null
@@ -328,10 +328,17 @@ class MailingService {
              */
             $mailing = Mailing::fetch($adhocMailing->getMailingId());
 
-            /**
-             * @var MailingListSubscriber $subscriber
-             */
-            $subscriber = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
+            $subscribers = [];
+
+            if ($adhocMailing->getEmailAddress())
+                $subscribers[] = new MailingListSubscriber($adhocMailing->getMailingId(), null, $adhocMailing->getEmailAddress(), null, $adhocMailing->getName());
+
+            if ($adhocMailing->getSendToMailingLists()) {
+                foreach ($mailing->getMailingListIds() ?? [] as $mailingListId) {
+                    $subscribers = array_merge($subscribers, $this->mailingListService->getSubscribersForMailingList($mailingListId) ?? []);
+                }
+            }
+
 
             $ccAddresses = [];
             if ($adhocMailing->getCcAddresses()) {
@@ -347,11 +354,15 @@ class MailingService {
                 }
             }
 
-            // Send the single mailing
-            $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(),
-                $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
-                $ccAddresses,
-                $bccAddresses);
+
+            // Send to all subscribers
+            foreach ($subscribers as $subscriber) {
+                // Send the single mailing
+                $this->sendSingleMailing($mailing, $subscriber, $adhocMailing->getTitle(),
+                    $adhocMailing->getSections(), $adhocMailing->getParameters(), $adhocMailing->getFromAddress(), $adhocMailing->getReplyToAddress(),
+                    $ccAddresses,
+                    $bccAddresses);
+            }
 
         };
 

@@ -14,14 +14,27 @@ class AdhocMailing {
 
 
     /**
+     * Name if using a single targeted person
+     *
      * @var string
      */
     private $name;
 
     /**
+     * Email address if using a single targeted person
+     *
      * @var string
      */
     private $emailAddress;
+
+
+    /**
+     * If this is set, the attached mailing lists will be sent to in addition to
+     * the single target if set.
+     *
+     * @var boolean
+     */
+    private $sendToMailingLists;
 
 
     /**
@@ -67,6 +80,7 @@ class AdhocMailing {
      * @param int $mailingId
      * @param string $name
      * @param string $emailAddress
+     * @param $sendToMailingLists
      * @param TemplateSection[] $sections
      * @param TemplateParameter[] $parameters
      * @param string $title
@@ -75,7 +89,7 @@ class AdhocMailing {
      * @param string $ccAddresses
      * @param string $bccAddresses
      */
-    public function __construct($mailingId, $name, $emailAddress, array $sections = [], array $parameters = [], $title = null, $fromAddress = null, $replyToAddress = null, $ccAddresses = [], $bccAddresses = []) {
+    public function __construct($mailingId, $name, $emailAddress, $sendToMailingLists = false, array $sections = [], array $parameters = [], $title = null, $fromAddress = null, $replyToAddress = null, $ccAddresses = [], $bccAddresses = []) {
         $this->mailingId = $mailingId;
         $this->name = $name;
         $this->emailAddress = $emailAddress;
@@ -86,6 +100,7 @@ class AdhocMailing {
         $this->replyToAddress = $replyToAddress;
         $this->ccAddresses = $ccAddresses;
         $this->bccAddresses = $bccAddresses;
+        $this->sendToMailingLists = $sendToMailingLists;
     }
 
 
@@ -130,6 +145,21 @@ class AdhocMailing {
     public function setEmailAddress($emailAddress) {
         $this->emailAddress = $emailAddress;
     }
+
+    /**
+     * @return bool|mixed
+     */
+    public function getSendToMailingLists() {
+        return $this->sendToMailingLists;
+    }
+
+    /**
+     * @param bool|mixed $sendToMailingLists
+     */
+    public function setSendToMailingLists($sendToMailingLists) {
+        $this->sendToMailingLists = $sendToMailingLists;
+    }
+
 
     /**
      * @return string
