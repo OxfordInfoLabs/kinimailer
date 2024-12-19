@@ -128,7 +128,8 @@ class Mailing extends MailingSummary {
             $this->emailAddresses,
             $this->mailingProfile ? $this->mailingProfile->returnSummary() : null,
             $this->scheduledTask ? $this->scheduledTask->returnSummary() : null,
-            $this->attachments, $this->allowAdhocTriggerFromOtherAccounts,
+            $this->attachments,
+            $this->allowAdhocTriggerFromOtherAccounts,
             $this->id
         );
     }
