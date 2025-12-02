@@ -4,3 +4,5 @@ node_modules
 db.log
 kinimailer*.db
 .phpunit*
+composer.lock
+phpunit.cache
